@@ -1,0 +1,19 @@
+Package: jardim2023
+Type: Package
+Title: Jardim et al. (2023)
+Version: 0.0.0.9000
+Authors@R: c(
+    person(given   = "Victor",
+           family  = "Leite Jardim",
+           role    = c("aut", "cre", "cph"),
+           email   = "vleitejardim@gmail.com",
+           comment = c(ORCID = "0000-0001-5192-6485")))
+Description: Research compendium of the project Jardim et al. (2023): 
+    Habitat Complexity Promotes Species Richness and Community Stability in 
+    Maerl (Rhodolith) Beds
+URL: https://github.com/victorleitejardim/jardim2023
+BugReports: https://github.com/victorleitejardim/jardim2023/issues
+License: GPL-2
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.2.3

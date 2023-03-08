@@ -1,0 +1,271 @@
+---
+title: "Jardim et al. (2023): Supplementary Materials"
+format:
+  html:
+    toc: true
+    toc-title: Contents
+    toc-location: left
+    toc-depth: 5
+    theme:
+      - minty
+      - custom.scss
+    self-contained: true
+    embed-resources: true
+    code-fold: true
+    code-overflow: wrap
+    code-tools: true
+    fig-align: center
+    tbl-cap-location: top
+    fig-cap-location: bottom
+    page-layout: full
+crossref: 
+  fig-title: Figure S
+  tbl-title: Table S
+bibliography: bibliography.bib
+editor_options: 
+  chunk_output_type: console
+---
+
+This document contains all data analyses presented in the main article as well as supplementary materials.
+
+The analysis was organized using the make-line pipeline tool provided by targets [@landau2021]. You will find raw data as well as all functions used in the pipeline in the project's research compendium created with the rcompendium package [@casajusn.2022].
+
+You can take a look at the pipeline in order to understand some steps (mostly related to tidying data)
+
+```{r}
+#| echo: false
+#| include: false
+#| warning: false
+#| message: false
+network <- targets::tar_visnetwork(reporter = "silent")
+```
+
+```{r}
+#| echo: false
+#| layout: [[-10, 80, -10]]
+#| warning: false
+#| message: false
+network
+```
+
+# Packages
+
+```{r}
+#| warning: false
+#| message: false
+library(dplyr)
+library(tidyr)
+library(vegan)
+library(ggplot2)
+library(targets)
+library(ggrepel)
+theme_set(theme_light())
+
+```
+
+# Habitat Complexity
+
+Take a look at the structure of the final complexity dataset
+
+```{r}
+#| layout: [[-10, 80, -10]]
+#| tbl-cap: First lines of the complexity dataset
+
+tar_load(comp)
+knitr::kable(head(comp))
+```
+
+Most variables are not normally distributed so we apply a box-cox [@box1964] transformation and check correlations between the transformed variables
+
+```{r}
+#| label: fig-pairscomp
+#| message: false
+#| fig-width: 14
+#| fig-height: 10
+
+tar_read(pairscomp)
+```
+
+## PCA of all observations
+
+Let's check it without removing highly correlated variables
+
+```{r}
+#| label: fig-screep1
+#| fig-cap: Screeplot of the PCA including all observations and all variables
+tar_load(pcatotal)
+tar_read(sptot)
+```
+
+We had up to 6 relevant axes to look at, but we know we have several highly correlated variables
+
+```{r}
+#| fig-width: 20
+#| fig-height: 8.75
+#| label: fig-pcafull
+#| fig-cap: PCA of all observations
+
+tar_load(pcatot)
+plot(pcatot)
+
+
+```
+
+```{r}
+#| label: fig-screep2
+#| fig-cap: Screeplot of the PCA including all observations and selected variables
+tar_load(pcatotsel)
+tar_read(sptotsel)
+```
+
+Let's check the biplots of the selected variables
+
+```{r}
+#| fig-width: 20
+#| fig-height: 8.75
+#| label: fig-pcafullsel
+#| fig-cap: PCA of all observations after variable selection
+
+tar_load(pcasel)
+plot(pcasel)
+```
+
+## PCA of median values
+
+```{r}
+#| label: fig-screep3
+#| fig-cap: Screeplot of the PCA of median values at the point level
+tar_read(spmedsel)
+```
+
+Let's check the biplots of the selected variables
+
+### Figure 1
+
+```{r}
+#| fig-width: 20
+#| fig-height: 8.75
+#| fig-cap: Figure 1 (main article)
+
+tar_load(pcamed)
+plot(pcamed)
+
+
+```
+## Check correlation between the centroids of the total PCA and the scores of the reduced PCA
+```{r}
+#| label: fig-corcomp
+#| fig-cap: Relation between Full PCA centroids and Reduced PCA scores
+#| fig-subcap: 
+#|   - "PC1"
+#|   - "PC2"
+#| layout-ncol: 2
+
+tar_load(corcomp)
+plot(corcomp[[1]])
+plot(corcomp[[2]])
+tar_read(cortestcomp1)
+tar_read(cortestcomp2)
+```
+
+# Fauna
+
+```{r}
+#| layout: [[-10, 80, -10]]
+#| tbl-cap: First lines of the original macrofaunal data
+
+tar_load(faunadata)
+knitr::kable(head(faunadata))
+```
+
+## Data availability
+
+```{r}
+#| label: fig-data
+#| fig-cap: Number of grab samples taken every year at each point
+#| message: false
+
+samplespoint <- faunadata %>% 
+  mutate(Date=as.factor(format.Date(faunadata$Date,"%Y"))) %>% 
+  distinct(Site, Year, Point, Replicate) %>%
+  group_by(Site, Year, Point) %>%
+  mutate(Year = as.factor(Year)) %>% 
+  summarise(count = n()) %>%
+  ungroup() %>%
+  mutate(State = factor(case_when(count==3 ~ "Good", count < 3 ~ "Sample(s) missing", count > 3 ~ "Too many samples")))
+
+ggplot(samplespoint, aes(x=Year,y=Point,fill=State)) +
+  geom_tile(alpha=0.5) +
+  scale_fill_manual(values=c("palegreen3","lightblue", "indianred")) +
+  geom_text(aes(label=count)) +
+  theme(text=element_text(size =15), axis.text.x = element_text(angle = 90, size = 15), legend.position = "bottom")
+```
+
+Empty cells show points where no samples were collected at a given date due to field constraints.
+
+## Alpha diversity
+
+### Total richness
+
+```{r}
+# Total richness
+tar_load(faunaclass)
+total_rich <- nrow(faunaclass %>% 
+  distinct(., Species)) #725 species
+
+# Total richness by sediment position
+
+epi_rich <- nrow(faunaclass %>% 
+  filter(Position == "Epifauna") %>% 
+  distinct(., Species)) #341 epifaunal species
+
+
+inf_rich <- nrow(faunaclass %>% 
+  filter(Position == "Infauna") %>% 
+  distinct(., Species)) #266  infaunal species
+
+
+int_rich <- nrow(faunaclass %>% 
+  filter(Position == "Interstice") %>% 
+  distinct(., Species)) #118 interstitial species
+```
+
+There are **`r total_rich`** species in total, **`r epi_rich`** being epifaunal, **`r inf_rich`** being infaunal, and **`r int_rich`** interstitial.
+
+### Relative abundance
+
+#### Figure S2
+
+```{r}
+#| label: fig-phylord
+#| fig-cap: Average Relative Abundance of Main Phyla and Orders
+#| fig-subcap: 
+#|   - Main Phylla
+#|   - Main Orders
+#| layout-nrow: 2
+#| fig-cap-location: top
+
+tar_read(relab_phy)
+tar_read(relab_ord) 
+
+
+```
+
+p.s.: it is normal to have NAs for some orders as higher classification for some of the species is ambiguous or unknown.
+
+```{r}
+#| label: fig-fam
+#| fig-cap: Families Average Relative Abundance for Each Main Phyla
+#| fig-subcap: 
+#|   - "Arthropoda"
+#|   - "Annelida"
+#|   - "Mollusca"
+#| fig-cap-location: top
+#| layout: [[50,50], [-25,50,-25]]
+#| out-width: 
+
+tar_read(relab_arth)
+tar_read(relab_ann) 
+tar_read(relab_mol)
+
+```
