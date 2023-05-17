@@ -6,40 +6,18 @@
 <!-- badges: start -->
 <!-- badges: end -->
 
-The goal of the R package `jardim2023` is to **{{ PLEASE ADD A FEW LINES
-}}**
+This is the research compendium containing all analysis in Jardim et
+al. (2023) : **Habitat Complexity Promotes Species Richness and
+Community Stability in Biogenic Habitats:** *an example from maerl
+(rhodolith) beds*
 
-## Installation
+## Running the code
 
-You can install the development version from
-[GitHub](https://github.com/) with:
-
-``` r
-# install.packages("remotes")
-remotes::install_github("victorleitejardim/jardim2023")
-```
-
-Then you can attach the package `jardim2023`:
-
-``` r
-library("jardim2023")
-```
-
-## Overview
-
-Here is an overview of `jardim2023` content: **{{ PLEASE ADD A FEW LINES
-}}**
-
-## Citation
-
-Please cite this package as:
-
-> Leite Jardim Victor (2023) jardim2023: An R package to **{{ TITLE
-> }}**. R package version 0.0.0.9000.
+You can run all analysis and generate the supp. materials html file only
+by sourcing the make.R file once you have forked the compendium.
 
 ## Code of Conduct
 
-Please note that the `jardim2023` project is released with a
-[Contributor Code of
+Please note that this project is released with a [Contributor Code of
 Conduct](https://contributor-covenant.org/version/2/0/CODE_OF_CONDUCT.html).
 By contributing to this project, you agree to abide by its terms.
