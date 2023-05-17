@@ -16,7 +16,21 @@ comp.med <- function(data){
   comp_med <- data %>% 
     select(-Sample) %>% 
     group_by(Mini, Site, Point) %>% 
-    summarise_if(is.numeric, median)
+    summarise_if(is.numeric, median) %>%
+    ungroup() %>% 
+    set_rownames(paste(.$Point))
+  
+  return(comp_med)
+}
+
+comp.site <- function(data){
+  
+  comp_med <- data %>% 
+    select(-Sample) %>% 
+    group_by(Site) %>% 
+    summarise_if(is.numeric, median) %>%
+    ungroup() %>% 
+    set_rownames(paste(.$Site))
   
   return(comp_med)
 }
@@ -30,6 +44,20 @@ bc.compmed <- function(data){
     mutate(Broken_density = boxcoxTransform(Broken_density+1, boxcox(.$Broken_density+1, optimize = TRUE )$lambda)) %>% 
     mutate(Dry_weight = boxcoxTransform(Dry_weight, boxcox(.$Dry_weight, optimize = TRUE )$lambda)) %>%
     set_rownames(paste(.$Mini)) %>% 
+    ungroup()
+  
+  return(bccomp_med)
+}
+
+bc.compsite <- function(data){
+  bccomp_med <- data %>% 
+    mutate(L = boxcoxTransform(L, boxcox(.$L, optimize = TRUE )$lambda)) %>%
+    mutate(I = boxcoxTransform(I, boxcox(.$I, optimize = TRUE )$lambda)) %>%
+    mutate(S = boxcoxTransform(S, boxcox(.$S, optimize = TRUE )$lambda)) %>%
+    mutate(Total_Density = boxcoxTransform(Total_Density, boxcox(.$Total_Density, optimize = TRUE )$lambda)) %>% 
+    mutate(Broken_density = boxcoxTransform(Broken_density+1, boxcox(.$Broken_density+1, optimize = TRUE )$lambda)) %>% 
+    mutate(Dry_weight = boxcoxTransform(Dry_weight, boxcox(.$Dry_weight, optimize = TRUE )$lambda)) %>%
+    set_rownames(paste(.$Site)) %>% 
     ungroup()
   
   return(bccomp_med)
@@ -51,10 +79,18 @@ compmed.num <- function(data){
   return(compnum)
 }
 
+compsite.num <- function(data){
+  compnum <- data %>% 
+    ungroup() %>% 
+    column_to_rownames(.,"Site")
+  
+  return(compnum)
+}
+
 extract.pc <- function(data, pca){
   pc.scores <- data %>% 
-    mutate(PC1_score =  scores(pca,choices = 1, scaling = 1, display = "sites")) %>% 
-    mutate(PC2_score =  scores(pca,choices = 2, scaling = 1, display = "sites")) 
+    mutate(PC1_score =  as.vector(scores(pca,choices = 1, scaling = 1, display = "sites"))) %>% 
+    mutate(PC2_score =  -as.vector(scores(pca,choices = 2, scaling = 1, display = "sites"))) #reverse y axis
   return(pc.scores)
 }
 

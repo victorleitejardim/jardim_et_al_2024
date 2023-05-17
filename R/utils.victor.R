@@ -165,7 +165,7 @@
     
     require(ggrepel)
     metadata <- as.data.frame(metadata)
-    group <- (metadata$site)
+    group <- (metadata$Site)
     stat <- stat
     lvl <- lvl
     wanted <- names(draw_list[c("species","sites","constraints")])

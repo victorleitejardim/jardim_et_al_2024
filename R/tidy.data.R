@@ -20,6 +20,7 @@ tidy.depth <- function(data) {
     mutate(Site = factor(Site, levels = c("Belle-ile", "Meaban", "Glenan", "Trevignon", "Camaret", "Keraliou", "Rozegat", "Molene", "Morlaix", "Saint-Brieuc"))) %>% 
     mutate(Point = factor(Point, levels = c("Belle-ile 1","Belle-ile 2", "Belle-ile 3", "Meaban 1", "Meaban 2", "Meaban 3", "Glenan 1", "Glenan 2", "Glenan 3", "Trevignon 1", "Trevignon 2", "Trevignon 3", "Camaret 1", "Camaret 2", "Camaret 3", "Keraliou 1", "Keraliou 2", "Keraliou 3", "Rozegat 1", "Rozegat 2", "Rozegat 3", "Molene 1", "Molene 2", "Molene 3", "Morlaix 1", "Morlaix 2", "Morlaix 3", "Saint-Brieuc 1", "Saint-Brieuc 2", "Saint-Brieuc 3"))) %>% 
     mutate(depth = -depth) %>% 
+    rename(Depth = depth) %>% 
     as.data.frame() %>%
     set_rownames(paste( .$Point)) %>% 
     mutate_if(is.character, as.factor)
@@ -44,10 +45,9 @@ tidy.granulo <- function(data){
     mutate(Point = factor(Point, levels = c("Belle-ile 1","Belle-ile 2", "Belle-ile 3", "Meaban 1", "Meaban 2", "Meaban 3", "Glenan 1", "Glenan 2", "Glenan 3", "Trevignon 1", "Trevignon 2", "Trevignon 3", "Camaret 1", "Camaret 2", "Camaret 3", "Keraliou 1", "Keraliou 2", "Keraliou 3", "Rozegat 1", "Rozegat 2", "Rozegat 3", "Molene 1", "Molene 2", "Molene 3", "Morlaix 1", "Morlaix 2", "Morlaix 3", "Saint-Brieuc 1", "Saint-Brieuc 2", "Saint-Brieuc 3"))) %>%
     select(mini, everything()) %>%
     as.data.frame() %>%
+    select(Point, Site, Season, Year, mud, Gravel, pourcentage_MO) %>% #remove highly correlated variables
+    rename(Mud = mud, OM = pourcentage_MO) %>% 
     set_rownames(paste( .$Point, .$Year, sep = "_")) %>% 
-    rename(OM = pourcentage_MO) %>% 
-    select(-boulder, -Sand, -`D50(um)`) %>% #remove highly correlated variables
-    rename(Mud = mud, Grain_size = Mean.fw.um) %>% 
     mutate_if(is.character, as.factor)
   
   granulo <- droplevels(granulo)
@@ -71,7 +71,7 @@ tidy.hydro <- function(data){
     rename(Point = point_name, Site = site, Year = annee, Season = saison) %>% 
     mutate(Site = factor(Site, levels = c("Belle-ile", "Meaban", "Glenan", "Trevignon", "Camaret", "Keraliou", "Rozegat", "Molene", "Morlaix", "Saint-Brieuc"))) %>% 
     mutate(Point = factor(Point, levels = c("Belle-ile 1","Belle-ile 2", "Belle-ile 3", "Meaban 1", "Meaban 2", "Meaban 3", "Glenan 1", "Glenan 2", "Glenan 3", "Trevignon 1", "Trevignon 2", "Trevignon 3", "Camaret 1", "Camaret 2", "Camaret 3", "Keraliou 1", "Keraliou 2", "Keraliou 3", "Rozegat 1", "Rozegat 2", "Rozegat 3", "Molene 1", "Molene 2", "Molene 3", "Morlaix 1", "Morlaix 2", "Morlaix 3", "Saint-Brieuc 1", "Saint-Brieuc 2", "Saint-Brieuc 3"))) %>% 
-    select(Site:Year, bottomT_mean, bottomT_max, bottomT_sd, current_mean) %>% 
+    select(Site:Year, bottomT_mean, bottomT_sd, current_mean) %>% #current mean, max and sd were perfectly correlated, same goes to bottom temperature max and sd.
     mutate_if(is.character, as.factor) %>% 
     as.data.frame() %>% 
     set_rownames(paste(.$Point, .$Year, sep = "_"))
@@ -104,8 +104,9 @@ tidy.fetch <- function(data){
     gather(North:West, key = "Direction", value = Fetch) %>% 
     group_by(Point, Site, latitude, longitude) %>% 
     summarise(Fetch_max = max(Fetch)) %>% 
+    ungroup() %>% 
     left_join(fetch) %>% 
-    select(Site, Point, North:Average, Fetch_max) %>% 
+    select(Site, Point, Fetch_max) %>% 
     as.data.frame() %>% 
     set_rownames(paste(.$Point))
   
@@ -175,4 +176,5 @@ fauna.dens <- function(data, fauna){
     mutate_if(is.numeric, funs(./(fauna$count*0.3))) %>% #change all the abundances to densities by dividing by the number of grabs available X the surface of a grab sample (0.3 m2)
     set_rownames(paste(.$Point, .$Year, sep = "_")) %>% 
     arrange(rownames(.))
+  return(maerl_dens)
 }

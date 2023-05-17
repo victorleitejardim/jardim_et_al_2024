@@ -29,3 +29,27 @@ fauna.compart <- function(data, compartment){
   
   return(compart)
 }
+
+
+fauna.phyl <- function(data, phyl){
+  samples_phyl <- data %>%
+    filter(Phylum == phyl) %>% 
+    distinct(Site, Year, Point, Season, Replicate) %>%
+    group_by(Site, Point, Season, Year) %>%
+    summarise(count = n()) %>%
+    ungroup()
+  
+  phyl <- data %>% 
+    filter(Phylum == phyl) %>%
+    select(Point, Site, Replicate, Year, Season, Date, Species, Phylum, Abundance) %>% 
+    mutate(Year = as.factor(Year)) %>% 
+    group_by(Point, Site, Year, Season, Species) %>%
+    summarise(Abundance =  sum(Abundance)) %>% 
+    ungroup() %>% 
+    spread(key = Species, value = Abundance, fill = 0) %>% 
+    mutate_if(is.numeric, funs(./(samples_phyl$count*0.3))) %>% 
+    set_rownames(paste(.$Point, .$Year, sep = "_"))
+  
+  
+  return(phyl)
+}

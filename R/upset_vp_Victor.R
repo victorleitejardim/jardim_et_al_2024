@@ -73,7 +73,7 @@
 #' }
 #' }
 
-upset_vp_victor <- function(x, plot.hp = TRUE, order.part = "effect", decreasing.part = TRUE, order.var = TRUE, decreasing.var = TRUE, cutoff = -1, nVar = 30, col.width = 0.6, pch.size = 3, line.lwd = 0.5, show.effect = TRUE, effect.cex = 2.7, title.cex = 10, axis.cex = 8, height.ratio = c(2, 1), width.ratio = c(1, 3), int.var = NULL, pal = NULL) {
+upset_vp_victor <- function(x, plot.hp = TRUE, order.part = "effect", decreasing.part = TRUE, order.var = TRUE, decreasing.var = TRUE, cutoff = -1, nVar = 30, col.width = 0.6, pch.size = 3, line.lwd = 0.5, show.effect = TRUE, effect.cex = 2.7, title.cex = 10, axis.cex = 8, height.ratio = c(2, 1), width.ratio = c(1, 3), int.var = NULL, pal = NULL, int.col = 1) {
   if (class(x) != "rdaccahp")
     stop("x should be the output of rdacca.hp() !")
   Constrained <- 100*x$Total_explained_variation
@@ -102,7 +102,7 @@ upset_vp_victor <- function(x, plot.hp = TRUE, order.part = "effect", decreasing
   
   p.vp <- ggplot2::ggplot(data = Var.part, aes_string(x = 'Var', y = 'Fractions', fill = 'Code')) +
     ggplot2::geom_col(width = col.width) +
-    ggplot2::scale_fill_manual(values = c(pal[1], 'gray80')) +
+    ggplot2::scale_fill_manual(values = c(pal[int.col], 'gray80')) +
     ggplot2::theme(panel.grid = element_blank(),
                    panel.background = element_blank(),
                    axis.line.y = element_line(color = 'black'),

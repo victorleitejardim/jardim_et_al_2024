@@ -7,6 +7,6 @@ screep <- function(rda, nb = 10){
   geom_line(aes(x = PC, y =  bstick, group = 1), col = "indianred")+
   labs(x = "PC", y = "Inertia")
 
-plot(p)
+p
 }
 

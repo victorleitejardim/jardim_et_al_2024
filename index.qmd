@@ -1,14 +1,23 @@
 ---
 title: "Jardim et al. (2023): Supplementary Materials"
+author: 
+  - Victor L. Jardim
+  
+crossref:
+  fig-prefix: Figure S
+  fig-title: Supplementary Figure
+  subref-labels: alpha a
+  thm-prefix: Figure
+  thm-title: Figure
+  tbl-prefix: Table S
+  tbl-title: Supplementary Table
 format:
   html:
     toc: true
     toc-title: Contents
     toc-location: left
     toc-depth: 5
-    theme:
-      - minty
-      - custom.scss
+    theme: minty
     self-contained: true
     embed-resources: true
     code-fold: true
@@ -18,26 +27,31 @@ format:
     tbl-cap-location: top
     fig-cap-location: bottom
     page-layout: full
-crossref: 
-  fig-title: Figure S
-  tbl-title: Table S
+    sidebar: true
 bibliography: bibliography.bib
 editor_options: 
-  chunk_output_type: console
+  chunk_output_type: console  
+execute: 
+  cache: refresh
 ---
 
-This document contains all data analyses presented in the main article as well as supplementary materials.
+```{r}
+#| include: false
+knitr::opts_chunk$set(echo = TRUE, message=FALSE, warning=FALSE, error = TRUE, eval = TRUE, cache = FALSE)
+```
+
+This document contains all data analyses presented in the main text as well as supplementary materials mentioned and extra information on the analysis for those interested (not cross-referenced).
 
 The analysis was organized using the make-line pipeline tool provided by targets [@landau2021]. You will find raw data as well as all functions used in the pipeline in the project's research compendium created with the rcompendium package [@casajusn.2022].
 
-You can take a look at the pipeline in order to understand some steps (mostly related to tidying data)
+You can take a look at the pipeline in order to have an idea of the different steps for creating the main models and figures. Each target is defined at the \_targets.R file in the research compendium.
 
 ```{r}
 #| echo: false
 #| include: false
 #| warning: false
 #| message: false
-network <- targets::tar_visnetwork(reporter = "silent")
+network <- targets::tar_visnetwork(reporter = "silent", targets_only = TRUE, exclude = "pal", level_separation = 500, label = c("time", "size"))
 ```
 
 ```{r}
@@ -45,8 +59,43 @@ network <- targets::tar_visnetwork(reporter = "silent")
 #| layout: [[-10, 80, -10]]
 #| warning: false
 #| message: false
+#| fig-cap: Analysis pipeline. Total runtime and storage size of each object (target) are shown.
 network
 ```
+
+# Table of figures
+
+| Supplementary   | Main text  |
+|-----------------|------------|
+| @fig-pcafullsel | @thm-fig-1 |
+| @fig-clust      | @thm-fig-2 |
+| @fig-corcomp    | @thm-fig-3 |
+| @fig-data       | @thm-fig-4 |
+| @fig-phylord    | @thm-fig-5 |
+| @fig-fam        | @thm-fig-6 |
+| @fig-cor        | @thm-fig-7 |
+| @fig-psJ        | @thm-fig-8 |
+| @fig-psN2       |            |
+
+# Table of tables
+
+[***Unfortunately links only redirect to tabsets open by default but not hidden ones. Please look for tables related to analyses by phylum or by compartment in their respective tabsets.***]{.smallcaps}
+
+| Supplementary Tables |
+|:--------------------:|
+|       @tbl-S1        |
+|       @tbl-S2        |
+|       @tbl-S3        |
+|       @tbl-S4        |
+|    @tbl-rich-phyl    |
+|   @tbl-rich-trait    |
+|      @tbl-bdtot      |
+|      @tbl-bdann      |
+|      @tbl-bdart      |
+|      @tbl-bdmol      |
+|      @tbl-bdepi      |
+|      @tbl-bdinf      |
+|      @tbl-bdint      |
 
 # Packages
 
@@ -59,11 +108,12 @@ library(vegan)
 library(ggplot2)
 library(targets)
 library(ggrepel)
+library(patchwork)
 theme_set(theme_light())
 
 ```
 
-# Habitat Complexity
+# Habitat Complexity {.unnumbered}
 
 Take a look at the structure of the final complexity dataset
 
@@ -78,21 +128,23 @@ knitr::kable(head(comp))
 Most variables are not normally distributed so we apply a box-cox [@box1964] transformation and check correlations between the transformed variables
 
 ```{r}
-#| label: fig-pairscomp
 #| message: false
+#| fig-cap: Correlogram of box-cox transformed HC variables
 #| fig-width: 14
 #| fig-height: 10
 
 tar_read(pairscomp)
 ```
 
-## PCA of all observations
+## PCA of all observations {.unnumbered}
 
 Let's check it without removing highly correlated variables
 
 ```{r}
-#| label: fig-screep1
 #| fig-cap: Screeplot of the PCA including all observations and all variables
+#| fig-align: left
+#| fig-height: 3
+
 tar_load(pcatotal)
 tar_read(sptot)
 ```
@@ -102,19 +154,18 @@ We had up to 6 relevant axes to look at, but we know we have several highly corr
 ```{r}
 #| fig-width: 20
 #| fig-height: 8.75
-#| label: fig-pcafull
-#| fig-cap: PCA of all observations
+#| fig-cap: PCA of all observations and all variables
 
-tar_load(pcatot)
-plot(pcatot)
-
+tar_read(pcatot)
 
 ```
 
 ```{r}
-#| label: fig-screep2
 #| fig-cap: Screeplot of the PCA including all observations and selected variables
-tar_load(pcatotsel)
+#| fig-align: left
+#| fig-height: 3
+
+tar_read(pcatotsel)
 tar_read(sptotsel)
 ```
 
@@ -126,33 +177,54 @@ Let's check the biplots of the selected variables
 #| label: fig-pcafullsel
 #| fig-cap: PCA of all observations after variable selection
 
-tar_load(pcasel)
-plot(pcasel)
+tar_read(pcasel)
 ```
 
 ## PCA of median values
 
 ```{r}
-#| label: fig-screep3
 #| fig-cap: Screeplot of the PCA of median values at the point level
+#| fig-align: left
+#| fig-height: 3
+
 tar_read(spmedsel)
 ```
 
 Let's check the biplots of the selected variables
 
-### Figure 1
+::: {#thm-fig-1}
+```{r}
+#| fig-width: 14
+#| fig-height: 6.125
+#| fig-cap: Figure 1 (main text)
+
+tar_read(pcamed)
+```
+:::
 
 ```{r}
-#| fig-width: 20
-#| fig-height: 8.75
-#| fig-cap: Figure 1 (main article)
-
-tar_load(pcamed)
-plot(pcamed)
-
+#| include: false
+pdf(here::here("figures", "figure-1.pdf"), width = 12, height = 5.25)
+tar_read(pcamed)
+dev.off()
 
 ```
-## Check correlation between the centroids of the total PCA and the scores of the reduced PCA
+
+## Cluster of median site values
+
+Let's check if we find similar groupings using a ward's cluster
+
+```{r}
+#| label: fig-clust
+#| fig-width: 10
+#| fig-height: 4
+#| fig-cap: Ward's cluster of median complexity values at the site level
+#| fig-align: left
+tar_read(clustcomp)
+```
+
+## Correlation between the centroids of the total PCA and the scores of the reduced PCA
+
 ```{r}
 #| label: fig-corcomp
 #| fig-cap: Relation between Full PCA centroids and Reduced PCA scores
@@ -168,7 +240,7 @@ tar_read(cortestcomp1)
 tar_read(cortestcomp2)
 ```
 
-# Fauna
+# Macrofauna data availabity
 
 ```{r}
 #| layout: [[-10, 80, -10]]
@@ -178,11 +250,9 @@ tar_load(faunadata)
 knitr::kable(head(faunadata))
 ```
 
-## Data availability
-
 ```{r}
 #| label: fig-data
-#| fig-cap: Number of grab samples taken every year at each point
+#| fig-cap: Number of grab samples taken every year at each point. Empty cells show points where no samples were collected at a given date due to field constraints.
 #| message: false
 
 samplespoint <- faunadata %>% 
@@ -201,11 +271,9 @@ ggplot(samplespoint, aes(x=Year,y=Point,fill=State)) +
   theme(text=element_text(size =15), axis.text.x = element_text(angle = 90, size = 15), legend.position = "bottom")
 ```
 
-Empty cells show points where no samples were collected at a given date due to field constraints.
+# Local macrofaunal diversity
 
-## Alpha diversity
-
-### Total richness
+## Total richness
 
 ```{r}
 # Total richness
@@ -232,9 +300,7 @@ int_rich <- nrow(faunaclass %>%
 
 There are **`r total_rich`** species in total, **`r epi_rich`** being epifaunal, **`r inf_rich`** being infaunal, and **`r int_rich`** interstitial.
 
-### Relative abundance
-
-#### Figure S2
+## Relative abundance
 
 ```{r}
 #| label: fig-phylord
@@ -255,7 +321,7 @@ p.s.: it is normal to have NAs for some orders as higher classification for some
 
 ```{r}
 #| label: fig-fam
-#| fig-cap: Families Average Relative Abundance for Each Main Phyla
+#| fig-cap: "Families Average Relative Abundance for Each Main Phyla"
 #| fig-subcap: 
 #|   - "Arthropoda"
 #|   - "Annelida"
@@ -268,4 +334,911 @@ tar_read(relab_arth)
 tar_read(relab_ann) 
 tar_read(relab_mol)
 
+```
+
+# Effects of HC in local diversity
+
+```{r}
+#| label: fig-cor
+#| fig-cap: Correlogram of HC and physical environmental variables
+#| fig-width: 14
+#| fig-height: 10
+tar_read(correl)
+```
+
+## Density of macrofauna
+
+::: panel-tabset
+### Total macrofauna
+
+```{r}
+tar_read(densselR2)
+```
+
+```{r}
+#| label: tbl-S1
+#| tbl-cap: "Model statistics of macrofaunal density as a function of HC"
+
+
+tar_load(c(modfixdens12, modfdsel, modrdsel))
+jtools::export_summs(
+  modfixdens12,
+  modfdsel,
+  modrdsel,
+  model.names = c("Density ~ Complexity", "Density ~ Complexity + Environment", "Density ~ Complexity + Environment + (1|Site)"),
+  statistics = c(
+    N = "nobs",
+    DF = "df.residual",
+    AIC = "AIC",
+    BIC = "BIC",
+    `Marginal R2` = "r.squared.fixed",
+    `Conditional R2` = "r.squared",
+    `Adjusted R2` = "adj.r.squared",
+    `F` = "statistic",
+    `p-value` = "p.value"
+  ),
+    coefs = c(
+    "Rhodolith complexity (PC1)" = "PC1_score", 
+    "Bed complexity (PC2)" = "PC2_score",
+    "PC1:PC2" = "PC1_score:PC2_score",
+    "Mean current velocity" = "Current_mean",
+    "Depth",
+    "Exposure" = "Fetch_max",
+    "Gravel",
+    "Organic Matter %" = "OM",
+    "Mean Temperature" = "T_mean",
+    "Year"
+  ),
+  scale = TRUE,
+  error_pos = "right",
+  bold_signif = .05,
+  to.file = "docx",
+  file.name = "outputs/summs_tot_dens.docx"
+)
+```
+
+### By phylum
+
+```{r}
+#| tbl-cap: Model statistics of Density as a function of HC for each main phyla
+#| label: tbl-S2
+
+tar_load(c(modfdann, modrdann, modfdart, modrdart, modfdmol, modrdmol, modfdepi, modrdepi, modfdinf, modrdinf, modfdint, modrdint))
+
+jtools::export_summs(
+  modfdann,
+  modrdann,
+  modfdart,
+  modrdart,
+  modfdmol,
+  modrdmol,
+  model.names = c("Annelida LM","Annelida LMM", "Arthropoda LM", "Arthropoda LMM", "Mollusca LM", "Mollusca LMM"),
+  statistics = c(
+    N = "nobs",
+    `Residual DF` = "df.residual",
+    `Marginal R2` = "r.squared.fixed",
+    `Conditional R2` = "r.squared",
+    `Adjusted R2` = "adj.r.squared",
+    `F` = "statistic",
+    `p-value` = "p.value"
+  ),
+   coefs = c(
+    "Rhodolith complexity (PC1)" = "PC1_score", 
+    "Bed complexity (PC2)" = "PC2_score",
+    "PC1:PC2" = "PC1_score:PC2_score",
+    "Mean current velocity" = "Current_mean",
+    "Depth",
+    "Exposure" = "Fetch_max",
+    "Gravel",
+    "Organic Matter %" = "OM",
+    "Mean Temperature" = "T_mean",
+    "Year"
+  ),
+  scale = TRUE,
+  transform.response = TRUE,
+  error_pos = "right",
+  bold_signif = .05
+)
+
+
+```
+
+```{r}
+#| fig-cap: Main phyla density as a function of HC
+#| fig-subcap: 
+#|   - " "
+#|   - " "
+#|   - " "
+#|   - " "
+#|   - " "
+#|   - " "
+#| layout-ncol: 2
+tar_read(anndenspc1)
+tar_read(anndenspc2) 
+tar_read(artdenspc1)
+tar_read(artdenspc2)
+tar_read(moldenspc1)
+tar_read(moldenspc2)
+```
+
+### By compartment
+
+```{r}
+#| label: tbl-S3
+#| tbl-cap: Model statistics of density of macrofauna as a function of HC for each compartiment
+
+jtools::export_summs(
+  modfdepi,
+  modrdepi,
+  modfdinf,
+  modrdinf,
+  modfdint,
+  modrdint,
+  model.names = c("Epifauna LM", "Epifauna LMM", "Infauna LM", "Infauna LMM", "Interstitial fauna LM", "Interstitial fauna LMM"),
+  statistics = c(
+    N = "nobs",
+    `Residual DF` = "df.residual",
+    `Marginal R2` = "r.squared.fixed",
+    `Conditional R2` = "r.squared",
+    `F` = "statistic",
+    `p-value` = "p.value"
+  ),
+   coefs = c(
+    "Rhodolith complexity (PC1)" = "PC1_score", 
+    "Bed complexity (PC2)" = "PC2_score",
+    "PC1:PC2" = "PC1_score:PC2_score",
+    "Mean current velocity" = "Current_mean",
+    "Depth",
+    "Exposure" = "Fetch_max",
+    "Gravel",
+    "Organic Matter %" = "OM",
+    "Mud",
+    "Mean Temperature" = "T_mean",
+    "Temperature Variation (sd)" = "T_sd",
+    "Year"
+  ),
+  scale = TRUE,
+  transform.response = TRUE,
+  error_pos = "right",
+  bold_signif = .05
+)
+```
+
+```{r}
+#| fig-cap: Density of macrofauna as a function of HC at each compartment
+#| fig-subcap: 
+#|   - ""
+#|   - ""
+#|   - ""
+#|   - ""
+#|   - ""
+#|   - ""
+#| layout-ncol: 2
+tar_read(epidenspc1)
+tar_read(epidenspc2) 
+tar_read(infdenspc1)
+tar_read(infdenspc2)
+tar_read(intdenspc1)
+tar_read(intdenspc2)
+```
+:::
+
+::: {#thm-fig-2}
+```{r}
+#| fig-height: 8
+#| fig-width: 14
+#| fig-cap: Figure 2 (main text)
+#| fig-subcap: 
+#|   - Comparison by Phylum
+#|   - Comparison by Trait (not added in main text)
+#| layout-nrow: 2
+#| layout-ncol: 1
+
+tar_read(psdens)
+tar_read(psdtrait)
+```
+:::
+
+```{r}
+#| include: false
+pdf(here::here("figures", "figure-2.pdf"), width = 16, height = 10)
+tar_read(psdens)
+dev.off()
+```
+
+## Observed richness
+
+Check if the relationships between HC and species richness are the same for the total macrofauna as well as for the main phyla and the main compartments (different positions in sediment) separately.
+
+::: panel-tabset
+### Total macrofauna
+
+Now we first forward select environmental variables and then add sites as a random factor to control for pseudo-replication and other site-related variables that were not taken into account.
+
+::: {#thm-fig-3}
+```{r}
+#| fig-cap: Figure 3. OLS linear regression of Total Macrofauna Richness as a function of HC
+#| fig-subcap: 
+#|   - "Bed complexity"
+#|   - "Rhodolith complexity"
+#| fig-cap-location: top
+#| layout: [[50,50]]
+
+tar_read(totrichpc1)
+tar_read(figure3)
+```
+:::
+
+```{r}
+#| include: false
+
+pdf(here::here("figures", "figure-3.pdf"), width = 12, height = 6)
+tar_read(figure3)
+dev.off()
+
+```
+
+```{r}
+#| label: tbl-S4
+#| tbl-cap: Model statistics of the final selected models of Richness
+tar_read(richselR2)
+tar_load(c(modfixrich12, modfrsel, modrrsel))
+
+jtools::export_summs(
+  modfixrich12,
+  modfrsel,
+  modrrsel,
+  model.names = c("S ~ Complexity", "S ~ Complexity + Environment", "S ~ Complexity + Environment + (1|Site)"),
+  statistics = c(
+    N = "nobs",
+    DF = "df.residual",
+    AIC = "AIC",
+    BIC = "BIC",
+    `Marginal R2` = "r.squared.fixed",
+    `Conditional R2` = "r.squared",
+    `Adjusted R2` = "adj.r.squared",
+    `F` = "statistic",
+    `p-value` = "p.value"
+  ),
+  coefs = c(
+    "Rhodolith complexity (PC1)" = "PC1_score", 
+    "Bed complexity (PC2)" = "PC2_score",
+    "PC1:PC2" = "PC1_score:PC2_score",
+    "Depth",
+    "Exposure" = "Fetch_max",
+    "Mean bottom temperature" = "T_mean",
+    "Organic Matter %" = "OM",
+    "Year"
+  ),
+  scale = TRUE,
+  error_pos = "right",
+  to.file = "docx",
+  bold_signif = .05,
+  file.name = "outputs/summs_tot_rich.docx"
+)
+```
+
+You might notice that PC1 was not selected as it has a very small effect size and doesn't contribute enough to the adjusted R2. I kept it in the final model anyways for comparison with the complexity-only model.
+
+::: {#thm-fig-4}
+```{r}
+#| fig-width: 14
+#| fig-height: 8
+#| fig-cap: Figure 4 (main text)
+#| warning: false
+#| message: false
+tar_read(psrich)
+
+```
+:::
+
+```{r}
+#| include: false
+pdf(here::here("figures", "figure-4.pdf"), width = 16, height = 10)
+tar_read(psrich)
+dev.off()
+```
+
+### By phylum
+
+```{r}
+#| label: tbl-rich-phyl
+#| tbl-cap: Model statistics of richness as a function of HC for each main phyla 
+
+tar_load(c(modrrann, modrrart, modrrmol, modrrepi, modrrinf, modrrint))
+
+jtools::export_summs(
+  modrrann,
+  modrrart,
+  modrrmol,
+  model.names = c("Annelida", "Arthropoda", "Mollusca"),
+  statistics = c(
+    N = "nobs",
+    `Residual DF` = "df.residual",
+    `Marginal R2` = "r.squared.fixed",
+    `Conditional R2` = "r.squared",
+    `F` = "statistic",
+    `p-value` = "p.value"
+  ),
+  coefs = c(
+    "Rhodolith complexity (PC1)" = "PC1_score", 
+    "Bed complexity (PC2)" = "PC2_score",
+    "PC1:PC2" = "PC1_score:PC2_score"
+  ),
+  scale = TRUE,
+  error_pos = "right",
+  bold_signif = .05
+)
+
+
+```
+
+```{r}
+#| fig-cap: Main phyla richness as a function of HC
+#| fig-subcap: 
+#|   - ""
+#|   - ""
+#|   - ""
+#|   - ""
+#|   - ""
+#|   - ""
+#| layout-ncol: 2
+tar_read(annrichpc1)
+tar_read(annrichpc2) 
+tar_read(artrichpc1)
+tar_read(artrichpc2)
+tar_read(molrichpc1)
+tar_read(molrichpc2)
+```
+
+### By compartment
+
+```{r}
+#| label: tbl-rich-trait
+#| tbl-cap: Model statistics of richness as a function of HC for each compartiment
+jtools::export_summs(
+  modrrepi,
+  modrrinf,
+  modrrint,
+  model.names = c("Epifauna", "Infauna", "Interstitial fauna"),
+  statistics = c(
+    N = "nobs",
+    `Residual DF` = "df.residual",
+    `Marginal R2` = "r.squared.fixed",
+    `Conditional R2` = "r.squared",
+    `F` = "statistic",
+    `p-value` = "p.value"
+  ),
+    coefs = c(
+    "Rhodolith complexity (PC1)" = "PC1_score", 
+    "Bed complexity (PC2)" = "PC2_score",
+    "PC1:PC2" = "PC1_score:PC2_score"
+  ),
+  scale = TRUE,
+  error_pos = "right",
+  bold_signif = .05
+)
+```
+
+```{r}
+#| fig-cap: Species richness as a function of HC at each faunal compartment
+#| fig-subcap: 
+#|   - ""
+#|   - ""
+#|   - ""
+#|   - ""
+#|   - ""
+#|   - ""
+#| layout-ncol: 2
+tar_read(epirichpc1)
+tar_read(epirichpc2) 
+tar_read(infrichpc1)
+tar_read(infrichpc2)
+tar_read(intrichpc1)
+tar_read(intrichpc2)
+```
+:::
+
+As we can see, the marginal R2 for the models containing only a subset of the macrofauna are quite low. However, although the effects of HC are less evident in these cases, The pattern for most subsets is very similar to the general patter, with very slight positive effect of rhodolith complexity and a more important positive effect of bed complexity. Nevertheless Rhodolith complexity seems to play a more important role in driving annelid richness than the other main phyla.
+
+## N2
+
+```{r}
+#| label: fig-psN2 
+#| fig-width: 14
+#| fig-height: 8
+#| fig-cap: Regression coefficients of LMs and LMM of Simpson's inverse diversity (N2) as a function of HC and physical environmental variables.
+#| warning: false
+#| message: false
+tar_read(psN2)
+```
+
+## J
+
+```{r}
+#| label: fig-psJ
+#| fig-width: 14
+#| fig-height: 8
+#| fig-cap: Regression coefficients of LMs and LMM of Pielou's evenness (J) as a function of HC and physical
+#| warning: false
+#| message: false
+tar_read(psJ)
+```
+
+# Regional patterns of biodiversity
+
+## PCA
+
+```{r}
+#| fig-cap: Screeplot of the PCA of log-chord transformed density data of total macrofauna
+tar_read(spfauna)
+```
+
+Final PCA showing only the species with a godness of fit $\geq$ .3
+
+::: {#thm-fig-5}
+```{r}
+#| fig-width: 14
+#| fig-height: 6.125
+#| fig-cap: Figure 5 (main text)
+
+tar_read(faunapca)
+```
+:::
+
+```{r}
+#| include: false
+pdf(here::here("figures", "figure-5.pdf"), width = 16, height = 10)
+tar_read(faunapca)
+dev.off()
+```
+
+## Cluster
+
+```{r}
+#| label: fig-faunaclust
+#| fig-width: 10
+#| fig-height: 4
+#| fig-cap: Ward's cluster of median complexity values at the site level
+#| fig-align: left
+tar_read(faunaclust)
+```
+
+# Effects of HC on regional diversity patterns
+
+## Redundancy analysis
+
+After variable selection, we add sites as a factor to understand if we describe them well with the environmental variables we chose. We can look at the first two axes to have an idea of the relationships between the different explanatory variables.
+
+```{r}
+#| label: RDA-triplot
+#| fig-cap: RDA triplot showing the variability in species composition related to physical environmental variables and habitat complexity. The first two axes are shown. 
+#| fig-height: 8
+#| fig-width: 20
+
+tar_read(rdafsel)
+tar_load(rdasite)
+tar_read(triplotrda)
+RsquareAdj(rdasite)$adj.r.squared
+```
+
+We check the model's validity. Only 99 permutations were chosen for the validation by axis and by term here as they are really time consuming but the results are the same with 999 permutations. (Output is collapsed, click on code to see)
+
+```{r}
+#| collapse: true
+tar_read(aovsite)
+tar_read(aovaxis)
+tar_read(aovterm)
+```
+
+## Hierarchical partitioning
+
+::: {#thm-fig-6}
+```{r}
+#| fig-cap: Figure 6 (main text)
+#| fig-width: 16
+#| fig-height: 6
+tar_read(upsetmain)
+
+```
+:::
+
+```{r}
+#| include: false
+pdf(here::here("figures", "figure-6.pdf"), width = 16, height = 10)
+tar_read(upsetmain)
+dev.off()
+```
+
+```{r}
+#| label: HP-sep
+#| fig-cap: Hierarchical partitioning separating Rhodolith and Bed complexity
+#| fig-width: 16
+#| fig-height: 6
+tar_read(upsetsep)
+```
+
+# Community stability
+
+::: {#thm-fig-7}
+```{r}
+#| fig-cap: Figure 7 (main text)
+#| fig-height: 6
+#| fig-width: 12
+tar_read(bdplot)
+```
+:::
+
+```{r}
+#| include: false
+pdf(here::here("figures", "figure-7.pdf"), width = 16, height = 10)
+tar_read(bdplot)
+dev.off()
+```
+
+```{r}
+#| label: fig-repl
+#| fig-height: 6
+#| fig-width: 12
+#| fig-cap: Relative importance of the Replacement component of temporal BD
+#| panel: fill
+tar_read(replplot)
+```
+
+# Effects of HC on community stability
+
+::: panel-tabset
+## Total Macrofauna
+
+```{r}
+#| label: tbl-bdtot
+#| tbl-cap: Models statistics of temporal diversity metrics as a function of HC
+tar_load(c(modbdtot, modrdftot, modrptot))
+jtools::export_summs(
+  modbdtot,
+  modrptot,
+  modrdftot,
+  model.names = c("BDtotal", "Replacement", "Richness Difference"),
+  statistics = c(
+    N = "nobs",
+    `Residual DF` = "df.residual",
+    `R2` = "r.squared",
+    `Adjusted R2` = "adj.r.squared",
+    `F` = "statistic",
+    `p-value` = "p.value"
+  ),
+   coefs = c(
+    "Rhodolith complexity (PC1)" = "`poly(PC1_score, 2)`1",
+    "Rhodolith complexity (PC1)^2" = "`poly(PC1_score, 2)`2",
+    "Bed complexity (PC2)" = "PC2_score",
+    "PC1:PC2" = "`poly(PC1_score, 2)`1:PC2_score",
+    "PC1ˆ2:PC2" = "`poly(PC1_score, 2)`2:PC2_score"
+  ),
+  scale = TRUE,
+  transform.response = TRUE,
+  error_pos = "right",
+  bold_signif = .05
+)
+```
+
+```{r}
+#| fig-cap: Effects of HC on community stability
+#| layout: [[50,50], [50,50], [50,50]]
+
+tar_read(bdtotpc1)
+tar_read(bdtotpc2)
+tar_read(rdtotpc1)
+tar_read(rdtotpc2)
+tar_read(rptotpc1)
+tar_read(rptotpc2)
+```
+
+## By phylum
+
+::: panel-tabset
+### Annelida
+
+```{r}
+#| label: tbl-bdann
+#| tbl-cap:  Models statistics of annelid temporal diversity metrics as a function of HC
+tar_load(c(modbdann, modrdfann, modrpann))
+jtools::export_summs(
+  modbdann,
+  modrpann,
+  modrdfann,
+  model.names = c("BDtotal", "Replacement", "Richness Difference"),
+  statistics = c(
+    N = "nobs",
+    `Residual DF` = "df.residual",
+    `R2` = "r.squared",
+    `Adjusted R2` = "adj.r.squared",
+    `F` = "statistic",
+    `p-value` = "p.value"
+  ),
+   coefs = c(
+    "Rhodolith complexity (PC1)" = "`poly(PC1_score, 2)`1",
+    "Rhodolith complexity (PC1)^2" = "`poly(PC1_score, 2)`2",
+    "Bed complexity (PC2)" = "PC2_score",
+    "PC1:PC2" = "`poly(PC1_score, 2)`1:PC2_score",
+    "PC1ˆ2:PC2" = "`poly(PC1_score, 2)`2:PC2_score"
+  ),
+  scale = TRUE,
+  transform.response = TRUE,
+  error_pos = "right",
+  bold_signif = .05
+)
+```
+
+```{r}
+#| fig-cap: Effects of HC on annelid community stability
+#| layout: [[50,50], [50,50], [50,50]]
+
+tar_read(bdannpc1)
+tar_read(bdannpc2)
+tar_read(rdannpc1)
+tar_read(rdannpc2)
+tar_read(rpannpc1)
+tar_read(rpannpc2)
+```
+
+### Arthropoda
+
+```{r}
+#| label: tbl-bdart
+#| tbl-cap:  Models statistics of arthropod temporal diversity metrics as a function of HC
+tar_load(c(modbdart, modrdfart, modrpart))
+jtools::export_summs(
+  modbdart,
+  modrpart,
+  modrdfart,
+  model.names = c("BDtotal", "Replacement", "Richness Difference"),
+  statistics = c(
+    N = "nobs",
+    `Residual DF` = "df.residual",
+    `R2` = "r.squared",
+    `Adjusted R2` = "adj.r.squared",
+    `F` = "statistic",
+    `p-value` = "p.value"
+  ),
+   coefs = c(
+    "Rhodolith complexity (PC1)" = "`poly(PC1_score, 2)`1",
+    "Rhodolith complexity (PC1)^2" = "`poly(PC1_score, 2)`2",
+    "Bed complexity (PC2)" = "PC2_score",
+    "PC1:PC2" = "`poly(PC1_score, 2)`1:PC2_score",
+    "PC1ˆ2:PC2" = "`poly(PC1_score, 2)`2:PC2_score"
+  ),
+  scale = TRUE,
+  transform.response = TRUE,
+  error_pos = "right",
+  bold_signif = .05
+)
+
+```
+
+```{r}
+#| fig-cap: "Effects of HC on arthropod community stability"
+#| layout: [[50,50], [50,50], [50,50]]
+
+tar_read(bdartpc1)
+tar_read(bdartpc2)
+tar_read(rdartpc1)
+tar_read(rdartpc2)
+tar_read(rpartpc1)
+tar_read(rpartpc2)
+```
+
+### Mollusca
+
+```{r}
+#| label: tbl-bdmol
+#| tbl-cap:  Models statistics of mollusc temporal diversity metrics as a function of HC
+
+tar_load(c(modbdmol, modrdfmol, modrpmol))
+jtools::export_summs(
+  modbdmol,
+  modrpmol,
+  modrdfmol,
+  model.names = c("BDtotal", "Replacement", "Richness Difference"),
+  statistics = c(
+    N = "nobs",
+    `Residual DF` = "df.residual",
+    `R2` = "r.squared",
+    `Adjusted R2` = "adj.r.squared",
+    `F` = "statistic",
+    `p-value` = "p.value"
+  ),
+   coefs = c(
+    "Rhodolith complexity (PC1)" = "`poly(PC1_score, 2)`1",
+    "Rhodolith complexity (PC1)^2" = "`poly(PC1_score, 2)`2",
+    "Bed complexity (PC2)" = "PC2_score",
+    "PC1:PC2" = "`poly(PC1_score, 2)`1:PC2_score",
+    "PC1ˆ2:PC2" = "`poly(PC1_score, 2)`2:PC2_score"
+  ),
+  scale = TRUE,
+  transform.response = TRUE,
+  error_pos = "right",
+  bold_signif = .05
+)
+```
+
+```{r}
+#| fig-cap: "Effects of HC on mollusc community stability"
+#| layout: [[50,50], [50,50], [50,50]]
+
+tar_read(bdmolpc1)
+tar_read(bdmolpc2)
+tar_read(rdmolpc1)
+tar_read(rdmolpc2)
+tar_read(rpmolpc1)
+tar_read(rpmolpc2)
+```
+:::
+
+## By compartment
+
+::: panel-tabset
+### Epifauna
+
+```{r}
+#| label: tbl-bdepi
+#| tbl-cap:  Models statistics of epifaunal temporal diversity metrics as a function of HC
+
+tar_load(c(modbdepi, modrdfepi, modrpepi))
+jtools::export_summs(
+  modbdepi,
+  modrpepi,
+  modrdfepi,
+  model.names = c("BDtotal", "Replacement", "Richness Difference"),
+  statistics = c(
+    N = "nobs",
+    `Residual DF` = "df.residual",
+    `R2` = "r.squared",
+    `Adjusted R2` = "adj.r.squared",
+    `F` = "statistic",
+    `p-value` = "p.value"
+  ),
+   coefs = c(
+    "Rhodolith complexity (PC1)" = "`poly(PC1_score, 2)`1",
+    "Rhodolith complexity (PC1)^2" = "`poly(PC1_score, 2)`2",
+    "Bed complexity (PC2)" = "PC2_score",
+    "PC1:PC2" = "`poly(PC1_score, 2)`1:PC2_score",
+    "PC1ˆ2:PC2" = "`poly(PC1_score, 2)`2:PC2_score"
+  ),
+  scale = TRUE,
+  transform.response = TRUE,
+  error_pos = "right",
+  bold_signif = .05
+)
+
+```
+
+```{r}
+#| fig-cap: Effects of HC on epifaunal community stability
+#| layout: [[50,50], [50,50], [50,50]]
+
+tar_read(bdepipc1)
+tar_read(bdepipc2)
+tar_read(rdepipc1)
+tar_read(rdepipc2)
+tar_read(rpepipc1)
+tar_read(rpepipc2)
+```
+
+### Infauna
+
+```{r}
+#| label: tbl-bdinf
+#| tbl-cap:  Models statistics of infaunal temporal diversity metrics as a function of HC
+
+tar_load(c(modbdinf, modrdfinf, modrpinf))
+jtools::export_summs(
+  modbdinf,
+  modrpinf,
+  modrdfinf,
+  model.names = c("BDtotal", "Replacement", "Richness Difference"),
+  statistics = c(
+    N = "nobs",
+    `Residual DF` = "df.residual",
+    `R2` = "r.squared",
+    `Adjusted R2` = "adj.r.squared",
+    `F` = "statistic",
+    `p-value` = "p.value"
+  ),
+   coefs = c(
+    "Rhodolith complexity (PC1)" = "`poly(PC1_score, 2)`1",
+    "Rhodolith complexity (PC1)^2" = "`poly(PC1_score, 2)`2",
+    "Bed complexity (PC2)" = "PC2_score",
+    "PC1:PC2" = "`poly(PC1_score, 2)`1:PC2_score",
+    "PC1ˆ2:PC2" = "`poly(PC1_score, 2)`2:PC2_score"
+  ),
+  scale = TRUE,
+  transform.response = TRUE,
+  error_pos = "right",
+  bold_signif = .05
+)
+
+```
+
+```{r}
+#| fig-cap: "Effects of HC on infaunal community stability"
+#| layout: [[50,50], [50,50], [50,50]]
+
+tar_read(bdinfpc1)
+tar_read(bdinfpc2)
+tar_read(rdinfpc1)
+tar_read(rdinfpc2)
+tar_read(rpinfpc1)
+tar_read(rpinfpc2)
+```
+
+### Interstitial fauna
+
+```{r}
+#| label: tbl-bdint
+#| tbl-cap:  Models statistics of interstitial fauna temporal diversity metrics as a function of HC
+
+tar_load(c(modbdint, modrdfint, modrpint))
+jtools::export_summs(
+  modbdint,
+  modrpint,
+  modrdfint,
+  model.names = c("BDtotal", "Replacement", "Richness Difference"),
+  statistics = c(
+    N = "nobs",
+    `Residual DF` = "df.residual",
+    `R2` = "r.squared",
+    `Adjusted R2` = "adj.r.squared",
+    `F` = "statistic",
+    `p-value` = "p.value"
+  ),
+   coefs = c(
+    "Rhodolith complexity (PC1)" = "`poly(PC1_score, 2)`1",
+    "Rhodolith complexity (PC1)^2" = "`poly(PC1_score, 2)`2",
+    "Bed complexity (PC2)" = "PC2_score",
+    "PC1:PC2" = "`poly(PC1_score, 2)`1:PC2_score",
+    "PC1ˆ2:PC2" = "`poly(PC1_score, 2)`2:PC2_score"
+  ),
+  scale = TRUE,
+  transform.response = TRUE,
+  error_pos = "right",
+  bold_signif = .05
+)
+```
+
+```{r}
+#| fig-cap: "Effects of HC on intersitial community stability"
+#| layout: [[50,50], [50,50], [50,50]]
+
+tar_read(bdintpc1)
+tar_read(bdintpc2)
+tar_read(rdintpc1)
+tar_read(rdintpc2)
+tar_read(rpintpc1)
+tar_read(rpintpc2)
+```
+:::
+:::
+
+::: {#thm-fig-8}
+```{r}
+#| fig-width: 16
+#| fig-height: 10
+#| fig-cap: "Figure 8 (main text)"
+#| fig-subcap: 
+#|   - "Effects of HC on community stability by compartiment"
+#|   - "Effects of HC on community stability by phylum - not shown in main text"
+#| layout-nrow: 2
+#| layout-ncol: 1
+
+tar_read(bdtrait)
+tar_read(bdphyl)
+```
+:::
+
+```{r}
+#| include: false
+pdf(here::here("figures", "figure-8.pdf"), width = 16, height = 10)
+tar_read(bdphyl)
+tar_read(bdtrait)
+dev.off()
 ```
