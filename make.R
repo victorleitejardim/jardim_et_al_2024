@@ -7,6 +7,6 @@ remotes::install_deps(upgrade = "never")
 
 ## Run Project ----
 targets::tar_make()
-quarto::quarto_render(input = "index.qmd", output_file = "Jardim_et_al_2023_Supp_Mat.html")
+quarto::quarto_render(input = "index.qmd", output_file = "index.html")
 
 
