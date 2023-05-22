@@ -11,6 +11,8 @@ al. (2023) : **Habitat Complexity Promotes Species Richness and
 Community Stability in Biogenic Habitats:** *an example from maerl
 (rhodolith) beds*
 
+Please check the analysis and supplementary materials: https://victorleitejardim.github.io/jardim_et_al_2023/
+
 ## Running the code
 
 You can run all analysis and generate the supp. materials html file only
