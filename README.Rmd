@@ -17,11 +17,11 @@ knitr::opts_chunk$set(collapse  = TRUE,
 
 <!-- badges: end -->
 
-This is the research compendium containing all analysis in Jardim et al. (2023) : **Habitat Complexity Promotes Species Richness and Community Stability in Biogenic Habitats:** *an example from maerl (rhodolith) beds*
+This is the research compendium containing all analysis in Jardim et al. (2023) : **Habitat Complexity Promotes Species Richness and Community Stability in Biogenic Habitats:** *an example from maerl beds*
 
 ## Running the code
 
-You can run all analysis and generate the supp. materials html file only by sourcing the make.R file once you have forked the compendium.
+You can run all analysis and generate the Supporting Information html file only by sourcing the make.R file once you have forked the compendium.
 
 ## Code of Conduct
 

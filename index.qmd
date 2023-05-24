@@ -1,16 +1,16 @@
 ---
-title: "Jardim et al. (2023): Supplementary Materials"
+title: "Jardim et al. (2023): Supporting Information"
 author: 
   - Victor L. Jardim
   
 crossref:
   fig-prefix: Figure S
-  fig-title: Supplementary Figure
+  fig-title: Supporting Figure
   subref-labels: alpha a
   thm-prefix: Figure
   thm-title: Figure
   tbl-prefix: Table S
-  tbl-title: Supplementary Table
+  tbl-title: Supporting Table
 format:
   html:
     toc: true
@@ -40,7 +40,7 @@ execute:
 knitr::opts_chunk$set(echo = TRUE, message=FALSE, warning=FALSE, error = TRUE, eval = TRUE, cache = FALSE)
 ```
 
-This document contains all data analyses presented in the main text as well as supplementary materials mentioned and extra information on the analysis for those interested (not cross-referenced).
+This document contains all data analyses presented in the main text as well as supporting information mentioned and extra information on the analysis for those interested (not cross-referenced).
 
 The analysis was organized using the make-line pipeline tool provided by targets [@landau2021]. You will find raw data as well as all functions used in the pipeline in the project's research compendium created with the rcompendium package [@casajusn.2022].
 
@@ -65,7 +65,7 @@ network
 
 # Table of figures
 
-| Supplementary   | Main text  |
+| Supporting   | Main text  |
 |-----------------|------------|
 | @fig-pcafullsel | @thm-fig-1 |
 | @fig-clust      | @thm-fig-2 |
@@ -81,7 +81,7 @@ network
 
 [***Unfortunately links only redirect to tabsets open by default but not hidden ones. Please look for tables related to analyses by phylum or by compartment in their respective tabsets.***]{.smallcaps}
 
-| Supplementary Tables |
+| Supporting Tables |
 |:--------------------:|
 |       @tbl-S1        |
 |       @tbl-S2        |
