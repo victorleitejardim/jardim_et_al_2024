@@ -11,10 +11,10 @@ knitr::opts_chunk$set(collapse  = TRUE,
                       out.width = "100%")
 ```
 
-# jardim2023 <img src="man/figures/package-sticker.png" align="right" style="float:right; height:120px;"/>
+# Jardim et al. (2023): Data and Supporting Information <img src="man/figures/package-sticker.png" align="right" style="float:right; height:120px;"/>
 
 <!-- badges: start -->
-
+ [![License: GPL v2](https://img.shields.io/badge/License-GPL%20v2-blue.svg)](https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html)
 <!-- badges: end -->
 
 This is the research compendium containing all analysis in Jardim et al. (2023) : **Habitat Complexity Promotes Species Richness and Community Stability in Biogenic Habitats:** *an example from maerl beds*
