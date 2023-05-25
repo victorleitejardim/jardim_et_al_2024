@@ -21,9 +21,6 @@ You can run all analysis and generate the Supporting Information html
 file only by sourcing the make.R file once you have forked the
 compendium.
 
-Supporting Information is available at:
-<https://victorleitejardim.github.io/jardim_et_al_2023/>
-
 ## Code of Conduct
 
 Please note that this project is released with a [Contributor Code of

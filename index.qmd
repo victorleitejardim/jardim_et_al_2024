@@ -1,5 +1,6 @@
 ---
 title: "Jardim et al. (2023): Supporting Information"
+subtitle: "Appendix S1"
 author: 
   - Victor L. Jardim
   
@@ -17,6 +18,7 @@ format:
     toc-title: Contents
     toc-location: left
     toc-depth: 5
+    toc-expand: true
     theme: minty
     self-contained: true
     embed-resources: true
