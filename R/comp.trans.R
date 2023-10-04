@@ -90,7 +90,7 @@ compsite.num <- function(data){
 extract.pc <- function(data, pca){
   pc.scores <- data %>% 
     mutate(PC1_score =  as.vector(scores(pca,choices = 1, scaling = 1, display = "sites"))) %>% 
-    mutate(PC2_score =  -as.vector(scores(pca,choices = 2, scaling = 1, display = "sites"))) #reverse y axis
+    mutate(PC2_score =  as.vector(scores(pca,choices = 2, scaling = 1, display = "sites"))) #reverse y axis
   return(pc.scores)
 }
 

@@ -45,7 +45,7 @@ clustfauna <- function(data, pal){
     geom_text(data = dendro[["labels"]], aes(x = x, y = y, label = label, colour = label, hjust = 0), size = 20/.pt, nudge_y = .2)+
     coord_flip() +
     scale_y_reverse(expand=c(0.2, 0))+
-    scale_color_manual(values = pal)+
+    scale_colour_manual(values = pal)+
     theme_void()+
     theme(legend.position = "none")
   p

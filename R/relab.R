@@ -1,4 +1,6 @@
 require(dplyr)
+require(ggplot2)
+require(viridis)
 relab.mean <- function(data, classif, taxlvl, value = 5){
   # relab <- data %>% 
   #   mutate(Year = as.ordered(Year)) %>% 
@@ -72,10 +74,11 @@ relab.phyl <- function(data, classif, taxlvl, value = 5, phyl){
     mutate(thresh = forcats::fct_relevel(thresh, "Others", after = Inf))
   
   p <- ggplot(data = ph_sel, aes(x= Site, y = abrel, fill = thresh)) 
-  p <- p + geom_bar(position="stack", stat="identity")
+  p <- p + geom_col()
   p <- p + labs(x = "Site", y = "Relative Abundance", title = paste(phyl))
   p <- p + scale_fill_viridis_d(option = "mako", begin = 0.1, end = .9, direction = -1,  name = taxlvl)
-  p <- p +theme(axis.title.y = element_blank(), axis.title.x = element_blank(), panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.background = element_blank(), axis.ticks = element_blank(), legend.key.size = unit(.2, "cm"))
+  p <- p + geom_text(aes(label = thresh), position = position_stack(vjust = 0.5), colour = "white")
+  p <- p +theme(axis.title.y = element_blank(), axis.title.x = element_blank(), panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.background = element_blank(), axis.ticks = element_blank(), legend.position = "none")
   plot(p)
   
 }

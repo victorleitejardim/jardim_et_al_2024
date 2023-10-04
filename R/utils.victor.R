@@ -165,7 +165,7 @@
     
     require(ggrepel)
     metadata <- as.data.frame(metadata)
-    group <- (metadata$Site)
+    group <- (metadata$Site) # You have to change the name of the grouping column to Site even if it's another factor
     stat <- stat
     lvl <- lvl
     wanted <- names(draw_list[c("species","sites","constraints")])

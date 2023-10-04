@@ -21,13 +21,13 @@ list(
   tar_target(comp_site, comp.site(comp)), #median values at the site level
   tar_target(bccomp, bc.comp(comp)), #boxcox transformation
   tar_target(comp_num, comp.num(bccomp)), #only numeric
-  tar_target(comp_sel, bccomp %>% select(-DR1,-DR2,  -Broken_density, -I, -S, -Dry_weight)),
+  tar_target(comp_sel, bccomp %>% select(-DR1,-DR2,  -Broken_density, -D_gray, -D_bin, -I, -S, -Dry_weight)),
   tar_target(num_sel, comp.num(comp_sel)),
   tar_target(bcmed, bc.compmed(comp_med)), #boxcox transformation for median values
   tar_target(med_num, compmed.num(bcmed)), #only numeric
-  tar_target(med_sel, bcmed %>% select(-DR1,-DR2,  -Broken_density, -I, -S, -Dry_weight)),
+  tar_target(med_sel, bcmed %>% select(-DR1,-DR2, -Broken_density, -D_gray, -D_bin, -I, -S, -Dry_weight)),
   tar_target(bcsite, bc.compsite(comp_site)),
-  tar_target(site_sel, bcsite %>% select(-DR1,-DR2,  -Broken_density, -I, -S, -Dry_weight) %>%  set_rownames(paste(.$Site))),
+  tar_target(site_sel, bcsite %>% select(-DR1,-DR2, -D_gray,  -Broken_density, -I, -S, -Dry_weight) %>%  set_rownames(paste(.$Site))),
   tar_target(med_numsel, compmed.num(med_sel)),
   tar_target(pairscomp, GGally::ggpairs(bccomp %>% select_if(is.numeric) %>% select(-Sample))),
     #-- pca ----
@@ -61,7 +61,7 @@ list(
   
   tar_target(pcatotsel, rda(num_sel, scale = TRUE)),
   tar_target(bccomp2, extract.pc(bccomp, pcatotsel)), 
-  tar_target(sptotsel, screep(pcatotsel, nb = 7)),
+  tar_target(sptotsel, screep(pcatotsel)),
   tar_target(
     pcasel,
     bg_pca(
@@ -86,7 +86,7 @@ list(
   ),
   
   tar_target(pcamedsel, rda(med_numsel, scale = TRUE)),
-  tar_target(spmedsel, screep(pcamedsel, nb = 7)),
+  tar_target(spmedsel, screep(pcamedsel)),
   tar_target(
     pcamed,
     bg_pca(
@@ -99,18 +99,18 @@ list(
       add.centroids = TRUE,
       stat1 = "chull",
       conf.level = .8,
-      ysites = c(-1.1, .8),
-      xsites = c(-1.1, .8),
+      ysites = c(-.75, .75),
+      xsites = c(-.75, .75),
       ysp = c(-1.7, 1.7),
       xsp = c(-1.7, 1.7),
       axis.size = 16,
       axis.text = 20,
       c.size = 3,
-      nudge.x = c(-.16, .11, 0, 0, .1, .12, .12, .22, 0, -.28),
-      nudge.y = c(.11,-.08,-.1,-.1,-.09,-.1, .1, 0, -.1, 0),
+      nudge.x = c(0, 0, 0, 0, .08, .16, .12, 0, 0, 0),
+      nudge.y = c(.11,.11,-.1,-.1,-.09,-.1, .12, .1, -.1, -.24),
       font.size = 11 / .pt,
       ext.plot.scale = 2.5,
-      reverse.y = TRUE
+      reverse.y = FALSE
     )
   ),
   tar_target(
@@ -198,7 +198,7 @@ list(
   tar_target(correl, GGally::ggpairs(data = alphamod %>% select(PC1_score, PC2_score, Current_mean, T_mean, T_sd, Depth, Fetch_max, Mud, Gravel, OM))),
     #-- richness ----
   tar_target(modfixrich1, lm(data = alphamod, formula = S.obs ~ PC1_score)),
-  tar_target(modfixrichpoly1, lm(data = alphamod, formula = S.obs ~ poly(PC1_score,3))),
+  tar_target(modfixrichpoly1, lm(data = alphamod, formula = S.obs ~ poly(PC1_score,2))),
   tar_target(totrichpc1, ggplot(data = alphamod, aes(x = PC1_score,
                                                   y = S.obs,
                                                   colour = Site))+
@@ -230,6 +230,7 @@ list(
                                                face = "bold")) +
                guides(fill = guide_legend(title.position = "top"))),
   tar_target(modfixrich2, lm(data = alphamod, formula = S.obs ~ PC2_score)),
+  tar_target(modfixrichpoly2, lm(data = alphamod, formula = S.obs ~ poly(PC2_score,2))),
   tar_target(figure3, ggplot(data = alphamod, aes(x = PC2_score,
                                                   y = S.obs,
                                                   colour = Site))+
@@ -256,14 +257,16 @@ list(
                      legend.background = element_blank(),
                      legend.box.background = element_blank(),
                      legend.key = element_blank(),
+                     legend.position = "top",
                      axis.text = element_text(size = 20),
                      axis.title = element_text(size =22,
                                                face = "bold")) +
                guides(fill = guide_legend(title.position = "top"))),
   
   tar_target(modfixrich12, lm(data = alphamod, formula = S.obs ~ PC1_score * PC2_score)),
+  tar_target(modfixrichpoly12, lm(data = alphamod, formula = S.obs ~ poly(PC1_score,2) * poly(PC2_score,2))),
   tar_target(modranrich12, lme4::lmer(data = alphamod, formula = S.obs ~ PC1_score * PC2_score + (1|Site))),
-  tar_target(richselR2, adespatial::forward.sel(alphamod %>% select(S.obs), alphamod %>% select(Mud:Fetch_max, PC1_score, PC2_score))),
+  tar_target(richselR2, adespatial::forward.sel(alphamod %>% select(S.obs), alphamod %>% select(Mud:Fetch_max, PC1_score, PC2_score, Year))),
   tar_target(richselAIC, f.sel(alphamod %>% select(S.obs, Year, Mud:Fetch_max, PC1_score, PC2_score))),
   tar_target(modfrsel, lm(formula = S.obs ~ PC1_score * PC2_score + Depth + Fetch_max + T_mean + OM + Year, data = alphamod)),
   tar_target(modrrsel, lme4::lmer(formula = S.obs ~ PC1_score * PC2_score + Depth + Fetch_max + T_mean + OM + Year + (1|Site), data = alphamod)),
@@ -296,7 +299,7 @@ list(
       scale = TRUE) +
         theme(
           text = element_text(size = 30),
-          legend.position = "top",
+          legend.position = "right",
           legend.title = element_text(face = "bold", size = 22),
           legend.text = element_text(size = 20),
           legend.background = element_blank(),
@@ -774,30 +777,34 @@ list(
   tar_target(modrdmol, lme4::lmer(data = alphamod, formula = log(Mollusca) ~ PC1_score * PC2_score + Gravel  + OM + T_mean + Depth + Year + (1|Site))),
   tar_target(
     psdens,
-    p.summs(
-      modfdsel,
-      modfdann,
-      modfdart,
-      modfdmol,
-      modrdsel,
-      modrdann,
-      modrdart,
-      modrdmol,
-      pal = pal[c(1, 3:5)],
+    alpha.summs(
+      mod1 = modfixrich12,
+      mod2 = modfrsel,
+      mod3 = modrrsel,
+      mod4 = modfdsel,
+      mod5 = modfdann,
+      mod6 = modfdart,
+      mod7 = modfdmol,
+      mod8 = modrdsel,
+      mod9 = modrdann,
+      mod10 = modrdart,
+      mod11 =modrdmol,
+      pal = pal,
       coefs = c(
         "Rhodolith complexity (PC1)" = "PC1_score", 
         "Bed complexity (PC2)" = "PC2_score",
         "PC1:PC2" = "PC1_score:PC2_score",
-        "Mean current velocity" = "Current_mean",
         "Depth" = "Depth",
         "Exposure" = "Fetch_max",
         "Gravel" = "Gravel",
-        "Organic Matter %" = "OM",
-        "Mean Temperature" = "T_mean",
+        "Organic matter %" = "OM",
+        "Mean temperature" = "T_mean",
+        "Mean current velocity" = "Current_mean",
         "Year" = "Year"
       ),
-      model.names = c("1. Total macrofauna", "2. Annelids", "3. Arthropods", "4. Molluscs")
-      )
+      model.names = c("1. Total macrofauna", "2. Annelids", "3. Arthropods", "4. Molluscs"),
+      data = alphamod
+    ),
     ),
   
   tar_target(anndenspc1, ggplot(data = alphamod, aes(x = PC1_score,
@@ -1444,7 +1451,7 @@ tar_target(
   tar_target(sitebcdens, box.cox.chord(sitedens)),
   tar_target(pcafauna, rda(bcdens)),
   tar_target(spfauna, screep(pcafauna)),
-  tar_target(faunapca, bg_pca(pcafauna, metadata = fauna_dens, main.group = "Site", scale.fill = pal, scale.colour = pal, goodness.thresh = .55, stat1 = "ellipse", add.centroids = TRUE, ysites = c(-0.18, .18), xsites = c(-.18,.18), ysp = c(-.4,.5), xsp = c(-.4,.5), nudge.y = c(0,0,.017,-.02,.017,.017,0,.017,.017,.017), nudge.x = c(-.05, .05, -.02, 0, 0, .02, -.05, 0, 0, 0), conf.level = .8, font.size = 12/.pt, ext.plot.scale = 2.5, point.size = 1.5, c.size = 2.5, reverse.y = TRUE, reverse.x = TRUE)),
+  tar_target(faunapca, bg_pca(pcafauna, metadata = fauna_dens, main.group = "Site", scale.fill = pal, scale.colour = pal, goodness.thresh = .55, stat1 = "ellipse", add.centroids = TRUE, ysites = c(-0.18, .18), xsites = c(-.18,.18), ysp = c(-.5,.5), xsp = c(-.5,.5), nudge.y = c(0,0,-.022,.02,-.022,-.022,0,-.022,-.022,-.022), nudge.x = c(-.05, .05, -.02, 0, 0, .02, -.05, 0, 0, 0), conf.level = .8, font.size = 11/.pt, ext.plot.scale = 2.5, point.size = 2.5, axis.size = 16, axis.text = 20, c.size = 3, reverse.y = FALSE, reverse.x = TRUE)),
     #-- fauna cluster----
   tar_target(faunaclust, clustfauna(sitebcdens, pal)),
     #-- rda ----
@@ -1460,12 +1467,12 @@ tar_target(
   
   tar_target(rdafsel, adespatial::forward.sel(bcdens, envcomp_num, nperm = 999)),
   tar_target(rdafull, 
-             rda(formula = bcdens ~ Mud + Depth + Current_mean + Branching_density +  D_bin + Fetch_max + T_sd + Sphericity + T_mean + DR3 + Gravel + D_gray  +  Total_Density + L + OM + Year,
+             rda(formula = bcdens ~ Mud + Depth + Current_mean + Branching_density +  Fetch_max + T_sd + Sphericity + T_mean + DR3 + Gravel +  Total_Density + L + OM + Year,
                  data = envcomp)
              ),
   tar_target(vifrda, vif.cca(rdafull)),
   tar_target(rdasite, 
-             rda(formula = bcdens ~ Mud + Depth + Current_mean + Branching_density +  D_bin + Fetch_max + T_sd + Sphericity + T_mean + DR3 + Gravel + D_gray  +  Total_Density + L + OM + Year + Site,
+             rda(formula = bcdens ~ Mud + Depth + Current_mean + Branching_density +  Fetch_max + T_sd + Sphericity + T_mean + DR3 + Gravel +  Total_Density + L + OM + Year + Site,
                  data = envcomp)
   ),
   tar_target(triplotrda, autoplot.rda.victor(object = rdasite, axes = c(1,2), metadata = envcomp, scale.fill = pal, scale.colour = pal, layers = c("sites", "biplot", "regression", "centroids"), thresh = 0.24, stat = "ellipse", lvl = .8, legend.position = c(.5,.9), title.size = 22, font.size = 22/.pt, arrows = FALSE) + 

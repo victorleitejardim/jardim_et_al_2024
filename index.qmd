@@ -393,9 +393,7 @@ jtools::export_summs(
   ),
   scale = TRUE,
   error_pos = "right",
-  bold_signif = .05,
-  to.file = "docx",
-  file.name = "outputs/summs_tot_dens.docx"
+  bold_signif = .05
 )
 ```
 
@@ -614,13 +612,49 @@ jtools::export_summs(
   ),
   scale = TRUE,
   error_pos = "right",
-  to.file = "docx",
-  bold_signif = .05,
-  file.name = "outputs/summs_tot_rich.docx"
+  bold_signif = .05
 )
 ```
 
 You might notice that PC1 was not selected as it has a very small effect size and doesn't contribute enough to the adjusted R2. I kept it in the final model anyways for comparison with the complexity-only model.
+
+```{r}
+#| label: tbl-unimodal
+#| tbl-cap: Model statistics of the linear and unimodal models of Richness
+tar_load(c(modfixrich1, modfixrichpoly1, modfixrich2, modfixrichpoly2, modfixrich12, modfixrichpoly12))
+
+jtools::export_summs(
+  modfixrich1, 
+  modfixrichpoly1,
+  modfixrich2,
+  modfixrichpoly2,
+  modfixrich12,
+  modfixrichpoly12,
+  # model.names = c("Linear", "Quadratic"),
+  statistics = c(
+    N = "nobs",
+    DF = "df.residual",
+    AIC = "AIC",
+    BIC = "BIC",
+    `Adjusted R2` = "adj.r.squared",
+    `F` = "statistic",
+    `p-value` = "p.value"
+  ),
+  # coefs = c(
+  #   "Rhodolith complexity (PC1)" = "PC1_score", 
+  #   "Bed complexity (PC2)" = "PC2_score",
+  #   "PC1:PC2" = "PC1_score:PC2_score",
+  #   "Depth",
+  #   "Exposure" = "Fetch_max",
+  #   "Mean bottom temperature" = "T_mean",
+  #   "Organic Matter %" = "OM",
+  #   "Year"
+  # ),
+  scale = TRUE,
+  error_pos = "right",
+  bold_signif = .05
+)
+```
 
 ::: {#thm-fig-4}
 ```{r}
