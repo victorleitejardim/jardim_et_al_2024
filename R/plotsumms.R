@@ -45,21 +45,26 @@ alpha.summs <- function(mod1, mod2, mod3, mod0, mod4, mod5, mod6, mod7, mod8, mo
                              "S ~ Complexity + Environment + (1|Site)",
                              ''
                            ),
+                           legend.title = "Richness models",
                            coefs = coefs,
                            point.size = 4,
                            inner_ci_level =  .9,
                            scale = TRUE) +
+    ggtitle("Richness")+
     theme(
+      panel.border = element_rect(colour =  "black", linewidth = .5, fill = "transparent"),
+      plot.title = element_text(hjust = .5), 
       legend.position = "right",
       legend.title = element_text(face = "bold", size = 22),
       legend.text = element_text(size = 20),
       legend.background = element_blank(),
       legend.box.background = element_blank(),
-      legend.key = element_blank(),
+      legend.key = element_blank(), 
+      text = element_text(colour = "black"),
       axis.text = element_text(size = 20),
-      axis.title = element_text(size = 20, face = "bold")
+      axis.title = element_text(size =20, face = "bold")
     ) +
-    guides(colour = guide_legend(title.position = "top"))
+    guides(colour = guide_legend(title.position = "top", direction = "vertical"))
   
   p1 <- jtools::plot_summs(mod4,
                            mod5,
@@ -68,24 +73,27 @@ alpha.summs <- function(mod1, mod2, mod3, mod0, mod4, mod5, mod6, mod7, mod8, mo
                            colors = pal[c(9, 1, 3:4)], 
                            robust = FALSE, 
                            model.names = model.names,
+                           legend.title = "Density models",
                            coefs = coefs,
                            point.size = 4,
                            inner_ci_level =  .9,
                            scale = TRUE,
                            transform.response = TRUE)+
-    ggtitle("LMs")+
+    ggtitle("Density LMs")+
     theme(
-      plot.title = element_text(hjust = .5), 
+      plot.title = element_text(hjust = .5),
+      panel.border = element_rect(colour =  "black", linewidth = .5, fill = "transparent"),
       legend.position = "right",
       legend.title = element_text(face = "bold", size = 22),
       legend.text = element_text(size = 20),
       legend.background = element_blank(),
       legend.box.background = element_blank(),
-      legend.key = element_blank(), 
+      legend.key = element_blank(),
+      text = element_text(colour = "black"),
       axis.text = element_text(size = 20),
       axis.title = element_text(size =20, face = "bold")
     ) +
-    guides(colour = guide_legend(title.position = "top"))
+    guides(colour = guide_legend(title.position = "top", direction = "vertical"))
   
   p2 <-
     jtools::plot_summs(
@@ -101,8 +109,9 @@ alpha.summs <- function(mod1, mod2, mod3, mod0, mod4, mod5, mod6, mod7, mod8, mo
       inner_ci_level =  .9,
       scale = TRUE,
       transform.response = TRUE) +
-    ggtitle("LMMs") +
+    ggtitle("Density LMMs") +
     theme(
+      panel.border = element_rect(colour =  "black", linewidth = .5, fill = "transparent"),
       plot.title = element_text(hjust = .5),
       legend.position = "right",
       legend.title = element_text(face = "bold", size = 22),
@@ -110,29 +119,36 @@ alpha.summs <- function(mod1, mod2, mod3, mod0, mod4, mod5, mod6, mod7, mod8, mo
       legend.background = element_blank(),
       legend.box.background = element_blank(),
       legend.key = element_blank(),
+      text = element_text(colour = "black"),
       axis.text = element_text(size = 20),
       axis.title = element_text(size = 20, face = "bold"),
       axis.text.y = element_text(colour = "transparent")
     ) +
-    guides(colour = guide_legend(title.position = "top"))
+    guides(colour = guide_legend(title.position = "top", direction = "vertical"))
   
   yaxis <- cowplot::get_plot_component(p1, "axis-l")
+  legp0 <- cowplot::get_legend(p0)
+  legp1 <- cowplot::get_legend(p1)
+  
   p0 <- p0 + theme(axis.text.y = element_blank(),
-                   axis.ticks.y = element_blank())
+                   axis.ticks.y = element_blank(),
+                   legend.position = "none")
   p1 <- p1 + theme(axis.text.y = element_blank(),
-                   axis.ticks.y = element_blank())
+                   axis.ticks.y = element_blank(),
+                   legend.position = "none")
   p2 <- p2 + theme(axis.text.y = element_blank(),
-                   axis.ticks.y = element_blank())
+                   axis.ticks.y = element_blank(),
+                   legend.position = "none")
   require(patchwork)
   layout <- c(
-    area(2, 1, 59, 1),
-    area(1, 2, 60, 5),
-    area(1, 6, 60, 9),
-    area(1, 10, 60, 13),
-    area(2, 16, 59, 16)
+    area(2, 1, 59, 2),
+    area(1, 3, 60, 7),
+    area(1, 8, 60, 12),
+    area(1, 13, 60, 18),
+    area(63, 1, 80, 18)
   )
   
-  wrap_plots(yaxis, heights =  1)+p0+p1+p2+guide_area()+plot_layout(guides = "collect", design = layout)
+  wrap_plots(yaxis)+p0+p1+p2+(cowplot::ggdraw(legp0)|cowplot::ggdraw(legp1))+plot_layout(design = layout)
   #ggarrange(p1, p2, common.legend = TRUE, ncol = 2, legend = "right")
 }
 

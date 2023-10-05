@@ -37,10 +37,11 @@ relab.mean <- function(data, classif, taxlvl, value = 5){
     mutate(thresh = forcats::fct_relevel(thresh, "Others", after = Inf))
   
   p <- ggplot(data = relabfil_mean, aes(x= Site, y = abrel, fill = thresh)) 
-  p <- p + geom_bar(position="stack", stat="identity")
+  p <- p + geom_col(width = .95)
   p <- p + labs(x = "Site", y = "Relative Abundance")
   p <- p + scale_fill_viridis_d(option = "mako", begin = 0.1, end = .9, direction = -1,  name = taxlvl)
-  p <- p +theme(axis.title.y = element_blank(), axis.title.x = element_blank(), panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.background = element_blank(), axis.ticks = element_blank(), legend.key.size = unit(.2, "cm"))
+  p <- p + ggfittext::geom_bar_text(aes(label = thresh), position = "stack", colour = "white", fontface = "bold", place = "centre", min.size = 0, reflow = TRUE,fullheight = TRUE, contrast = TRUE, padding.y = grid::unit(0.01, units = "mm"))
+  p <- p +theme(axis.title.y = element_blank(), axis.title.x = element_blank(), panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.background = element_blank(), axis.ticks = element_blank(), legend.key.size = unit(.2, "cm"), legend.position = "none")
   plot(p)
 
 }
@@ -74,10 +75,10 @@ relab.phyl <- function(data, classif, taxlvl, value = 5, phyl){
     mutate(thresh = forcats::fct_relevel(thresh, "Others", after = Inf))
   
   p <- ggplot(data = ph_sel, aes(x= Site, y = abrel, fill = thresh)) 
-  p <- p + geom_col()
+  p <- p + geom_col(width = .95)
   p <- p + labs(x = "Site", y = "Relative Abundance", title = paste(phyl))
   p <- p + scale_fill_viridis_d(option = "mako", begin = 0.1, end = .9, direction = -1,  name = taxlvl)
-  p <- p + geom_text(aes(label = thresh), position = position_stack(vjust = 0.5), colour = "white")
+  p <- p + ggfittext::geom_bar_text(aes(label = thresh), position = "stack", colour = "white", fontface = "bold", place = "centre", min.size = 0, reflow = TRUE,fullheight = TRUE, contrast = TRUE, padding.y = grid::unit(0.01, units = "mm"))
   p <- p +theme(axis.title.y = element_blank(), axis.title.x = element_blank(), panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.background = element_blank(), axis.ticks = element_blank(), legend.position = "none")
   plot(p)
   

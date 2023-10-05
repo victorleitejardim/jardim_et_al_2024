@@ -124,6 +124,7 @@ list(
   tar_target(corcomp, cor.plot(med_sel2, pal)),
   tar_target(cortestcomp1, cor.test(med_sel2$PC1_c, med_sel2$PC1_score)),
   tar_target(cortestcomp2, cor.test(med_sel2$PC2_c, med_sel2$PC2_score)),
+  tar_target(rv, FactoMineR::coeffRV(med_sel2 %>% select(PC1_c, PC2_c), med_sel2 %>% select(PC1_score, PC2_score))),
   
     #-- cluster----
   tar_target(clustcomp, clustdend(site_sel, pal)),
@@ -1464,8 +1465,10 @@ tar_target(
                #mutate(code = paste(.$Point, .$Year, sep = "_")) %>% 
                select_if(Negate(is.factor))), #%>% 
                #column_to_rownames("code")),
-  
-  tar_target(rdafsel, adespatial::forward.sel(bcdens, envcomp_num, nperm = 999)),
+  tar_target(rdafselcomp, adespatial::forward.sel(bcdens, envcomp_num %>% select(Branching_density:DR3), nperm = 999)),
+  tar_target(rdafselgranulo, adespatial::forward.sel(bcdens, envcomp_num %>% select(Mud:OM), nperm = 999)),
+  tar_target(rdafseltemp, adespatial::forward.sel(bcdens, envcomp_num %>% select(T_mean:T_sd), nperm = 999)),
+  tar_target(rdafselhydro, adespatial::forward.sel(bcdens, envcomp_num %>% select(Current_mean, Fetch_max, ), nperm = 999)),
   tar_target(rdafull, 
              rda(formula = bcdens ~ Mud + Depth + Current_mean + Branching_density +  Fetch_max + T_sd + Sphericity + T_mean + DR3 + Gravel +  Total_Density + L + OM + Year,
                  data = envcomp)
