@@ -213,7 +213,7 @@ tar_read(pcamed)
 
 ```{r}
 #| include: false
-#| eval: false
+#| eval: true
 pdf(here::here("figures", "figure-1.pdf"), width = 12, height = 5.25)
 tar_read(pcamed)
 dev.off()
@@ -727,8 +727,8 @@ tar_read(psdtrait)
 
 ```{r}
 #| include: false
-#| eval: false
-pdf(here::here("figures", "figure-2.pdf"), width = 16, height = 10)
+#| eval: true
+pdf(here::here("figures", "figure-2B.pdf"), width = 16, height = 10)
 tar_read(psdens)
 dev.off()
 ```
@@ -826,8 +826,8 @@ tar_read(upsetmain)
 
 ```{r}
 #| include: false
-#| eval: false
-pdf(here::here("figures", "figure-6.pdf"), width = 16, height = 10)
+#| eval: true
+pdf(here::here("figures", "figure-3.pdf"), width = 16, height = 10)
 tar_read(upsetmain)
 dev.off()
 ```
@@ -865,7 +865,7 @@ tar_read(bdphyl)
 
 ```{r}
 #| include: false
-#| eval: false
+#| eval: true
 pdf(here::here("figures", "figure-4-A.pdf"), width = 16, height = 10)
 tar_read(bdplot)
 dev.off()
@@ -1218,11 +1218,3 @@ tar_read(rpintpc2)
 :::
 :::
 
-```{r}
-#| include: false
-#| eval: false 
-pdf(here::here("figures", "figure-8.pdf"), width = 16, height = 10)
-tar_read(bdphyl)
-tar_read(bdtrait)
-dev.off()
-```

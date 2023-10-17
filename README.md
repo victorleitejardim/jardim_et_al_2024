@@ -14,7 +14,7 @@ v2](https://img.shields.io/badge/License-GPL%20v2-blue.svg)](https://www.gnu.org
 
 This is the research compendium containing all analysis in Jardim et
 al. (2023) : **Habitat Complexity Promotes Species Richness and
-Community Stability in Biogenic Habitats:** *an example from maerl beds*
+Community Stability in Biogenic Habitats:** *a case study in maerl beds*
 
 ## Running the code
 
