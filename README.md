@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# Jardim et al. (2023): Data and Supporting Information <img src="man/figures/package-sticker.png" align="right" style="float:right; height:120px;"/>
+# Jardim et al. (2024): Data and Supporting Information <img src="man/figures/package-sticker.png" align="right" style="float:right; height:120px;"/>
 
 <!-- badges: start -->
 
