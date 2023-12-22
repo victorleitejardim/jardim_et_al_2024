@@ -1,5 +1,5 @@
 ---
-title: "Jardim et al. (2023): Supporting Information"
+title: "Jardim et al. (2024): Supporting Information"
 subtitle: "Appendix S1"
 author: 
   - Victor L. Jardim
@@ -794,7 +794,10 @@ After variable selection, we add sites as a factor to understand if we describe 
 #| fig-cap: RDA triplot showing the variability in species composition related to physical environmental variables and habitat complexity. The first two axes are shown. 
 #| fig-height: 8
 #| fig-width: 20
-
+tar_load(rdacomp)
+tar_load(rdahydro)
+tar_load(rdagranulo)
+tar_load(rdatemp)
 tar_read(rdafselcomp)
 tar_read(rdafseltemp)
 tar_read(rdafselgranulo)
@@ -803,7 +806,7 @@ tar_load(rdasite)
 tar_read(triplotrda)
 ```
 
-Adjusted R^2^ **\`r RsquareAdj(rdasite)\$adj.r.squared** We check the model's validity. Only 99 permutations were chosen for the validation by axis and by term here as they are really time consuming but the results are the same with 999 permutations. (Output is collapsed, click on code to see)
+Adjusted R^2^: `r RsquareAdj(rdasite)$adj.r.squared`. We check the model's validity. Only 99 permutations were chosen for the validation by axis and by term here as they are really time consuming but the results are the same with 999 permutations. (Output is collapsed, click on code to see)
 
 ```{r}
 #| collapse: true
@@ -1217,4 +1220,3 @@ tar_read(rpintpc2)
 ```
 :::
 :::
-

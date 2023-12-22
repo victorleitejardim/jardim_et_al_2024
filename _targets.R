@@ -21,13 +21,13 @@ list(
   tar_target(comp_site, comp.site(comp)), #median values at the site level
   tar_target(bccomp, bc.comp(comp)), #boxcox transformation
   tar_target(comp_num, comp.num(bccomp)), #only numeric
-  tar_target(comp_sel, bccomp %>% select(-DR1,-DR2,  -Broken_density, -D_gray, -D_bin, -I, -S, -Dry_weight)),
+  tar_target(comp_sel, bccomp %>% select(-DR1,-DR2, -I, -S)),
   tar_target(num_sel, comp.num(comp_sel)),
   tar_target(bcmed, bc.compmed(comp_med)), #boxcox transformation for median values
   tar_target(med_num, compmed.num(bcmed)), #only numeric
-  tar_target(med_sel, bcmed %>% select(-DR1,-DR2, -Broken_density, -D_gray, -D_bin, -I, -S, -Dry_weight)),
+  tar_target(med_sel, bcmed %>% select(-DR1,-DR2, -I, -S)),
   tar_target(bcsite, bc.compsite(comp_site)),
-  tar_target(site_sel, bcsite %>% select(-DR1,-DR2, -D_gray,  -Broken_density, -I, -S, -Dry_weight) %>%  set_rownames(paste(.$Site))),
+  tar_target(site_sel, bcsite %>% select(-DR1,-DR2, -I, -S) %>%  set_rownames(paste(.$Site))),
   tar_target(med_numsel, compmed.num(med_sel)),
   tar_target(pairscomp, GGally::ggpairs(bccomp %>% select_if(is.numeric) %>% select(-Sample))),
     #-- pca ----
@@ -1452,7 +1452,7 @@ tar_target(
   tar_target(sitebcdens, box.cox.chord(sitedens)),
   tar_target(pcafauna, rda(bcdens)),
   tar_target(spfauna, screep(pcafauna)),
-  tar_target(faunapca, bg_pca(pcafauna, metadata = fauna_dens, main.group = "Site", scale.fill = pal, scale.colour = pal, goodness.thresh = .55, stat1 = "ellipse", add.centroids = TRUE, ysites = c(-0.18, .18), xsites = c(-.18,.18), ysp = c(-.5,.5), xsp = c(-.5,.5), nudge.y = c(0,0,-.022,.02,-.022,-.022,0,-.022,-.022,-.022), nudge.x = c(-.05, .05, -.02, 0, 0, .02, -.05, 0, 0, 0), conf.level = .8, font.size = 11/.pt, ext.plot.scale = 2.5, point.size = 2.5, axis.size = 16, axis.text = 20, c.size = 3, reverse.y = FALSE, reverse.x = TRUE)),
+  tar_target(faunapca, bg_pca(pcafauna, metadata = fauna_dens, main.group = "Site", scale.fill = pal, scale.colour = pal, goodness.thresh = .40, stat1 = "ellipse", add.centroids = TRUE, ysites = c(-0.18, .18), xsites = c(-.18,.18), ysp = c(-.5,.5), xsp = c(-.5,.5), nudge.y = c(0,0,-.022,.02,-.022,-.022,0,-.022,-.022,-.022), nudge.x = c(-.05, .05, -.02, 0, 0, .02, -.05, 0, 0, 0), conf.level = .8, font.size = 11/.pt, ext.plot.scale = 2.5, point.size = 2.5, axis.size = 16, axis.text = 20, c.size = 3, reverse.y = FALSE, reverse.x = TRUE)),
     #-- fauna cluster----
   tar_target(faunaclust, clustfauna(sitebcdens, pal)),
     #-- rda ----
@@ -1465,10 +1465,14 @@ tar_target(
                #mutate(code = paste(.$Point, .$Year, sep = "_")) %>% 
                select_if(Negate(is.factor))), #%>% 
                #column_to_rownames("code")),
+  tar_target(rdacomp, rda(formula = bcdens ~ ., envcomp_num %>% select(Branching_density:DR3))),
+  tar_target(rdagranulo, rda(formula = bcdens ~ ., envcomp_num %>% select(Mud:OM))),
+  tar_target(rdatemp, rda(formula = bcdens ~ ., envcomp_num %>% select(T_mean:T_sd))),
+  tar_target(rdahydro, rda(formula = bcdens ~ ., envcomp_num %>% select(Current_mean, Fetch_max))),
   tar_target(rdafselcomp, adespatial::forward.sel(bcdens, envcomp_num %>% select(Branching_density:DR3), nperm = 999)),
   tar_target(rdafselgranulo, adespatial::forward.sel(bcdens, envcomp_num %>% select(Mud:OM), nperm = 999)),
   tar_target(rdafseltemp, adespatial::forward.sel(bcdens, envcomp_num %>% select(T_mean:T_sd), nperm = 999)),
-  tar_target(rdafselhydro, adespatial::forward.sel(bcdens, envcomp_num %>% select(Current_mean, Fetch_max, ), nperm = 999)),
+  tar_target(rdafselhydro, adespatial::forward.sel(bcdens, envcomp_num %>% select(Current_mean, Fetch_max), nperm = 999)),
   tar_target(rdafull, 
              rda(formula = bcdens ~ Mud + Depth + Current_mean + Branching_density +  Fetch_max + T_sd + Sphericity + T_mean + DR3 + Gravel +  Total_Density + L + OM + Year,
                  data = envcomp)

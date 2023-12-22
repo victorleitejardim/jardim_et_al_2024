@@ -4,9 +4,7 @@ bc.comp <- function(data){
     mutate(L = boxcoxTransform(L, boxcox(.$L, optimize = TRUE )$lambda)) %>%
     mutate(I = boxcoxTransform(I, boxcox(.$I, optimize = TRUE )$lambda)) %>%
     mutate(S = boxcoxTransform(S, boxcox(.$S, optimize = TRUE )$lambda)) %>%
-    mutate(Total_Density = boxcoxTransform(Total_Density, boxcox(.$Total_Density, optimize = TRUE )$lambda)) %>% 
-    mutate(Broken_density = boxcoxTransform(Broken_density+1, boxcox(.$Broken_density+1, optimize = TRUE )$lambda)) %>% 
-    mutate(Dry_weight = boxcoxTransform(Dry_weight, boxcox(.$Dry_weight, optimize = TRUE )$lambda)) %>%
+    mutate(Total_Density = boxcoxTransform(Total_Density, boxcox(.$Total_Density, optimize = TRUE )$lambda)) %>%
     set_rownames(paste(.$Mini, .$Sample, sep = "_")) %>% 
     ungroup()
 }
@@ -41,8 +39,6 @@ bc.compmed <- function(data){
     mutate(I = boxcoxTransform(I, boxcox(.$I, optimize = TRUE )$lambda)) %>%
     mutate(S = boxcoxTransform(S, boxcox(.$S, optimize = TRUE )$lambda)) %>%
     mutate(Total_Density = boxcoxTransform(Total_Density, boxcox(.$Total_Density, optimize = TRUE )$lambda)) %>% 
-    mutate(Broken_density = boxcoxTransform(Broken_density+1, boxcox(.$Broken_density+1, optimize = TRUE )$lambda)) %>% 
-    mutate(Dry_weight = boxcoxTransform(Dry_weight, boxcox(.$Dry_weight, optimize = TRUE )$lambda)) %>%
     set_rownames(paste(.$Mini)) %>% 
     ungroup()
   
@@ -55,8 +51,6 @@ bc.compsite <- function(data){
     mutate(I = boxcoxTransform(I, boxcox(.$I, optimize = TRUE )$lambda)) %>%
     mutate(S = boxcoxTransform(S, boxcox(.$S, optimize = TRUE )$lambda)) %>%
     mutate(Total_Density = boxcoxTransform(Total_Density, boxcox(.$Total_Density, optimize = TRUE )$lambda)) %>% 
-    mutate(Broken_density = boxcoxTransform(Broken_density+1, boxcox(.$Broken_density+1, optimize = TRUE )$lambda)) %>% 
-    mutate(Dry_weight = boxcoxTransform(Dry_weight, boxcox(.$Dry_weight, optimize = TRUE )$lambda)) %>%
     set_rownames(paste(.$Site)) %>% 
     ungroup()
   

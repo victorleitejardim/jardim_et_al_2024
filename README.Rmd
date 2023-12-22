@@ -11,7 +11,7 @@ knitr::opts_chunk$set(collapse  = TRUE,
                       out.width = "100%")
 ```
 
-# Jardim et al. (2023): Data and Supporting Information <img src="man/figures/package-sticker.png" align="right" style="float:right; height:120px;"/>
+# Jardim et al. (2024): Data and Supporting Information <img src="man/figures/package-sticker.png" align="right" style="float:right; height:120px;"/>
 
 <!-- badges: start -->
  [![License: GPL v2](https://img.shields.io/badge/License-GPL%20v2-blue.svg)](https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html)
