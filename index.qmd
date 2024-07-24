@@ -71,15 +71,13 @@ network
 |-----------------|------------|
 | @fig-data       | @thm-fig-1 |
 | @fig-pcafullsel | @thm-fig-2 |
-| @fig-corcomp    | @thm-fig-3 |
-| @fig-clust      | @thm-fig-4 |
-| @fig-cor        |            |
+| @fig-pca        | @thm-fig-3 |
+| @fig-corcomp    |            |
 | @fig-phylord    |            |
 | @fig-fam        |            |
-| @fig-psN2       |            |
-| @fig-psJ        |            |
-| @fig-pca        |            |
 | @fig-HP         |            |
+| @fig-psJ        |            |
+| @fig-psN2       |            |
 | @fig-repl       |            |
 
 # Table of tables
@@ -115,6 +113,9 @@ library(ggplot2)
 library(targets)
 library(ggrepel)
 library(patchwork)
+library(plotly)
+library(htmlwidgets)
+library(png)
 theme_set(theme_light())
 
 ```
@@ -201,15 +202,15 @@ tar_read(pcasel)
 
 Let's check the biplots of the selected variables
 
-::: {#thm-fig-1}
 ```{r}
+#| label: fig-pca
 #| fig-width: 14
 #| fig-height: 6.125
-#| fig-cap: Figure 1 (main text)
+#| fig-cap: Principal Component Analysis (PCA) of (A) median values of standardized habitat complexity metrics. Scaling 1 (distance biplot) in left panel, with outer plots representing the distribution at each site, and scaling 2 (correlation biplot) in right panel. Circles represent the median values for each sampling point, while triangles represent each site centroid with their relative convex hulls. Branching density - density of apical branches per rhodolith. L, I, S - Larger, Intermediate and Smaller diameter of a rhodolith. DR3 and Sphericity - Diameter ratios used to describe maerl shape. Maerl density - density of rhodoliths at each point. Different levels of bed and rhodolith complexity are exemplified
 
 tar_read(pcamed)
 ```
-:::
+
 
 ```{r}
 #| include: false
@@ -241,30 +242,7 @@ tar_read(cortestcomp2)
 
 RV coefficient = **`r rv$rv`**, p-value = **`r rv$p.value`**
 
-## Cluster of median site values
-
-Let's check if we find similar groupings using a ward's cluster
-
-```{r}
-#| label: fig-clust
-#| fig-width: 10
-#| fig-height: 4
-#| fig-cap: Ward's cluster of median complexity values at the site level
-#| fig-align: left
-tar_read(clustcomp)
-```
-
-# Check correlations between HC and other environmental variables
-
-```{r}
-#| label: fig-cor
-#| fig-cap: Correlogram of HC and physical environmental variables
-#| fig-width: 14
-#| fig-height: 10
-tar_read(correl)
-```
-
-# Local macrofaunal diversity
+# Macrofaunal diversity
 
 ```{r}
 # Total richness
@@ -334,6 +312,68 @@ tar_read(relab_mol)
 
 ```
 
+
+# Effects of HC on regional diversity patterns
+
+## Redundancy analysis
+
+After variable selection, we add sites as a factor to understand if we describe them well with the environmental variables we chose. We can look at the first two axes to have an idea of the relationships between the different explanatory variables.
+
+```{r}
+#| label: RDA-triplot
+#| fig-cap: RDA triplot showing the variability in species composition related to physical environmental variables and habitat complexity. The first two axes are shown. 
+#| fig-height: 8
+#| fig-width: 20
+tar_load(rdacomp)
+tar_load(rdahydro)
+tar_load(rdagranulo)
+tar_load(rdatemp)
+tar_read(rdafselcomp)
+tar_read(rdafseltemp)
+tar_read(rdafselgranulo)
+tar_read(rdafselhydro)
+tar_load(rdasite)
+tar_read(triplotrda)
+```
+
+Adjusted R^2^: `r RsquareAdj(rdasite)$adj.r.squared`. We check the model's validity. Only 99 permutations were chosen for the validation by axis and by term here as they are really time consuming but the results are the same with 999 permutations. (Output is collapsed, click on code to see)
+
+```{r}
+#| collapse: true
+tar_read(aovsite)
+tar_read(aovaxis)
+tar_read(aovterm)
+```
+
+## Hierarchical partitioning
+
+::: {#thm-fig-1}
+```{r}
+#| fig-cap: Figure 1 (main text)
+#| fig-width: 16
+#| fig-height: 6
+tar_read(upsetmain)
+
+```
+:::
+
+```{r}
+#| include: false
+#| eval: true
+pdf(here::here("figures", "figure-3.pdf"), width = 16, height = 10)
+tar_read(upsetmain)
+dev.off()
+```
+
+```{r}
+#| label: fig-HP
+#| fig-cap: Hierarchical partitioning separating Rhodolith and Bed complexity
+#| fig-width: 16
+#| fig-height: 6
+tar_read(upsetsep)
+```
+
+
 # Effects of HC in local diversity
 
 ::: {#thm-fig-2}
@@ -343,7 +383,8 @@ tar_read(relab_mol)
 #| layout-nrow: 2
 #| layout-ncol: 1
 
-tar_read(figure3) #figure 2-a
+knitr::include_graphics("figure2a.png", dpi = 90)
+
 tar_read(psdens) #figure 2-b
 ```
 
@@ -358,12 +399,6 @@ Check if the relationships between HC and species richness are the same for the 
 ### Total macrofauna
 
 Now we first forward select environmental variables and then add sites as a random factor to control for pseudo-replication and other site-related variables that were not taken into account.
-
-```{r}
-#| fig-cap: OLS linear regression of Total Macrofauna Richness as a function of Rhodolith complexity (Bed complexity is shown in Figure 2)
-
-tar_read(totrichpc1)
-```
 
 We check models with quadratic functions of both PC1 and PC2 to test for a unimodal relationship. Unimodal trends are never significant, suggesting an overall linear relationship. A significant interaction is found between PC1^2^ and both PC2 and PC2^2^ in the last model in @tbl-S1. Since there's a very slight difference in AICs and BICs between the last two models, we keep the more parsimonious one.
 
@@ -478,23 +513,6 @@ jtools::export_summs(
 
 ```
 
-```{r}
-#| fig-cap: Main phyla richness as a function of HC
-#| fig-subcap: 
-#|   - ""
-#|   - ""
-#|   - ""
-#|   - ""
-#|   - ""
-#|   - ""
-#| layout-ncol: 2
-tar_read(annrichpc1)
-tar_read(annrichpc2) 
-tar_read(artrichpc1)
-tar_read(artrichpc2)
-tar_read(molrichpc1)
-tar_read(molrichpc2)
-```
 
 ### By compartment
 
@@ -525,26 +543,9 @@ jtools::export_summs(
 )
 ```
 
-```{r}
-#| fig-cap: Species richness as a function of HC at each faunal compartment
-#| fig-subcap: 
-#|   - ""
-#|   - ""
-#|   - ""
-#|   - ""
-#|   - ""
-#|   - ""
-#| layout-ncol: 2
-tar_read(epirichpc1)
-tar_read(epirichpc2) 
-tar_read(infrichpc1)
-tar_read(infrichpc2)
-tar_read(intrichpc1)
-tar_read(intrichpc2)
-```
 :::
 
-As we can see, the marginal R2 for the models containing only a subset of the macrofauna are quite low. However, although the effects of HC are less evident in these cases, The pattern for most subsets is very similar to the general pattern, with very slight positive effect of rhodolith complexity and a more important positive effect of bed complexity. Nevertheless Rhodolith complexity seems to play a more important role in driving annelid richness than the other main phyla.
+As we can see, the marginal R2 for the models containing only a subset of the macrofauna are quite low. However, although the effects of HC are less evident in these cases, the pattern for most subsets is very similar to the general pattern, with very slight positive effect of rhodolith complexity and a more important positive effect of bed complexity. Nevertheless, rhodolith complexity seems to play a more important role in driving annelid richness than the other main phyla.
 
 ## Density of macrofauna
 
@@ -638,7 +639,7 @@ jtools::export_summs(
 ```
 
 ```{r}
-#| fig-cap: Main phyla density as a function of HC
+#| fig-cap: Marginal predictions of main phyla density as a function of HC
 #| fig-subcap: 
 #|   - " "
 #|   - " "
@@ -646,13 +647,16 @@ jtools::export_summs(
 #|   - " "
 #|   - " "
 #|   - " "
-#| layout-ncol: 2
-tar_read(anndenspc1)
-tar_read(anndenspc2) 
-tar_read(artdenspc1)
-tar_read(artdenspc2)
-tar_read(moldenspc1)
-tar_read(moldenspc2)
+#| layout-ncol: 1
+# tar_load(surfann)
+# save_image(surfann, "surfann.pdf", width = 1080, height = 1080)
+knitr::include_graphics("surfann.pdf")
+# tar_load(surfart)
+# save_image(surfart, "surfdart.pdf", width = 1080, height = 1080)
+knitr::include_graphics("surfart.pdf")
+# tar_read(surfmol)
+# save_image(surfmol, "surfmol.pdf", width = 1080, height = 1080)
+knitr::include_graphics("surfmol.pdf")
 ```
 
 ### By compartment
@@ -698,23 +702,6 @@ jtools::export_summs(
 )
 ```
 
-```{r}
-#| fig-cap: Density of macrofauna as a function of HC at each compartment
-#| fig-subcap: 
-#|   - ""
-#|   - ""
-#|   - ""
-#|   - ""
-#|   - ""
-#|   - ""
-#| layout-ncol: 2
-tar_read(epidenspc1)
-tar_read(epidenspc2) 
-tar_read(infdenspc1)
-tar_read(infdenspc2)
-tar_read(intdenspc1)
-tar_read(intdenspc2)
-```
 
 ```{r}
 #| fig-cap: Macrofaunal densities as a function of HC for each faunal compartment
@@ -728,9 +715,7 @@ tar_read(psdtrait)
 ```{r}
 #| include: false
 #| eval: true
-pdf(here::here("figures", "figure-2B.pdf"), width = 16, height = 10)
 tar_read(psdens)
-dev.off()
 ```
 
 ## N2
@@ -758,98 +743,13 @@ tar_read(psN2)
 tar_read(psJ)
 ```
 
-# Regional patterns of biodiversity
-
-## PCA
-
-The first axis of the PCA of the log-chord transformed community data (@fig-pca) highlights a very similar gradient in macrofaunal diversity to that of rhodolith complexity (Figure 1) and accounts for around 14 % of the variance in assemblages. The second axis mostly captures the latitudinal gradient in the study area, which explains around 9.3 % of the total variance. These gradients are mostly explained by differences in the presence and abundance of a few key species (the ones with at least 55 % of their variance represented in the first two axes). The crustacean Athanas nitescens (Leach, 1814) is very rare or never found in most sites except for Rozegat, Keraliou and Trevignon. These sites are also grouped by the presence of Pisidia longicornis, which is found in most sites but is a lot more abundant at the bay of Brest and Trevignon, reaching up to 90 % of relative abundance during some years in the latter. The crustacean Leptocheirus tricristatus (Chevreux, 1887) is present in most sites, with the exception of Rozegat and Keraliou, and is more abundant in Belle-Ile and Meaban (reaching up to 12 % of relative abundance). Finally, the polychaete Glycera lapidum is more abundant in Saint-Brieuc and Camaret but is very rare or absent in sites at the other end of the gradient.
-
-```{r}
-#| fig-width: 14
-#| label: fig-pca
-#| fig-height: 6.125
-#| fig-cap: "Principal Component Analysis of log-chord transformed macrofaunal species abundances. The first two axes represent around 23 % of the variance in community composition and structure. Left panel: distance biplot (scaling one) with outer plots representing the density of points for each site. Right panel: correlation biplot (scaling 2) showing species with for which at least 0.55 of their total variance is represented in the ordination plane."
-
-tar_read(faunapca)
-```
-
-## Cluster
-
-```{r}
-#| fig-width: 10
-#| fig-height: 4
-#| fig-cap: Ward's cluster of median complexity values at the site level
-#| fig-align: left
-tar_read(faunaclust)
-```
-
-# Effects of HC on regional diversity patterns
-
-## Redundancy analysis
-
-After variable selection, we add sites as a factor to understand if we describe them well with the environmental variables we chose. We can look at the first two axes to have an idea of the relationships between the different explanatory variables.
-
-```{r}
-#| label: RDA-triplot
-#| fig-cap: RDA triplot showing the variability in species composition related to physical environmental variables and habitat complexity. The first two axes are shown. 
-#| fig-height: 8
-#| fig-width: 20
-tar_load(rdacomp)
-tar_load(rdahydro)
-tar_load(rdagranulo)
-tar_load(rdatemp)
-tar_read(rdafselcomp)
-tar_read(rdafseltemp)
-tar_read(rdafselgranulo)
-tar_read(rdafselhydro)
-tar_load(rdasite)
-tar_read(triplotrda)
-```
-
-Adjusted R^2^: `r RsquareAdj(rdasite)$adj.r.squared`. We check the model's validity. Only 99 permutations were chosen for the validation by axis and by term here as they are really time consuming but the results are the same with 999 permutations. (Output is collapsed, click on code to see)
-
-```{r}
-#| collapse: true
-tar_read(aovsite)
-tar_read(aovaxis)
-tar_read(aovterm)
-```
-
-## Hierarchical partitioning
+# Community stability
 
 ::: {#thm-fig-3}
 ```{r}
-#| fig-cap: Figure 3 (main text)
 #| fig-width: 16
-#| fig-height: 6
-tar_read(upsetmain)
 
-```
-:::
-
-```{r}
-#| include: false
-#| eval: true
-pdf(here::here("figures", "figure-3.pdf"), width = 16, height = 10)
-tar_read(upsetmain)
-dev.off()
-```
-
-```{r}
-#| label: fig-HP
-#| fig-cap: Hierarchical partitioning separating Rhodolith and Bed complexity
-#| fig-width: 16
-#| fig-height: 6
-tar_read(upsetsep)
-```
-
-# Community stability
-
-::: {#thm-fig-4}
-```{r}
-#| fig-height: 6
-#| fig-width: 12
-tar_read(bdplot)
+knitr::include_graphics("figure3a.png")
 ```
 
 ```{r}
@@ -869,11 +769,11 @@ tar_read(bdphyl)
 ```{r}
 #| include: false
 #| eval: true
-pdf(here::here("figures", "figure-4-A.pdf"), width = 16, height = 10)
-tar_read(bdplot)
+pdf(here::here("figures", "figure-3-A.pdf"), width = 16, height = 10)
+tar_read(fig3a)
 dev.off()
 
-pdf(here::here("figures", "figure-4-B.pdf"), width = 16, height = 10)
+pdf(here::here("figures", "figure-3-B.pdf"), width = 16, height = 10)
 tar_read(bdtrait)
 dev.off()
 ```
@@ -923,17 +823,6 @@ jtools::export_summs(
 )
 ```
 
-```{r}
-#| fig-cap: Effects of HC on community stability
-#| layout: [[50,50], [50,50], [50,50]]
-
-tar_read(bdtotpc1)
-tar_read(bdtotpc2)
-tar_read(rdtotpc1)
-tar_read(rdtotpc2)
-tar_read(rptotpc1)
-tar_read(rptotpc2)
-```
 
 ## By phylum
 
@@ -971,17 +860,6 @@ jtools::export_summs(
 )
 ```
 
-```{r}
-#| fig-cap: Effects of HC on annelid community stability
-#| layout: [[50,50], [50,50], [50,50]]
-
-tar_read(bdannpc1)
-tar_read(bdannpc2)
-tar_read(rdannpc1)
-tar_read(rdannpc2)
-tar_read(rpannpc1)
-tar_read(rpannpc2)
-```
 
 ### Arthropoda
 
@@ -1017,18 +895,6 @@ jtools::export_summs(
 
 ```
 
-```{r}
-#| fig-cap: "Effects of HC on arthropod community stability"
-#| layout: [[50,50], [50,50], [50,50]]
-
-tar_read(bdartpc1)
-tar_read(bdartpc2)
-tar_read(rdartpc1)
-tar_read(rdartpc2)
-tar_read(rpartpc1)
-tar_read(rpartpc2)
-```
-
 ### Mollusca
 
 ```{r}
@@ -1061,18 +927,6 @@ jtools::export_summs(
   error_pos = "right",
   bold_signif = .05
 )
-```
-
-```{r}
-#| fig-cap: "Effects of HC on mollusc community stability"
-#| layout: [[50,50], [50,50], [50,50]]
-
-tar_read(bdmolpc1)
-tar_read(bdmolpc2)
-tar_read(rdmolpc1)
-tar_read(rdmolpc2)
-tar_read(rpmolpc1)
-tar_read(rpmolpc2)
 ```
 :::
 
@@ -1114,18 +968,6 @@ jtools::export_summs(
 
 ```
 
-```{r}
-#| fig-cap: Effects of HC on epifaunal community stability
-#| layout: [[50,50], [50,50], [50,50]]
-
-tar_read(bdepipc1)
-tar_read(bdepipc2)
-tar_read(rdepipc1)
-tar_read(rdepipc2)
-tar_read(rpepipc1)
-tar_read(rpepipc2)
-```
-
 ### Infauna
 
 ```{r}
@@ -1159,18 +1001,6 @@ jtools::export_summs(
   bold_signif = .05
 )
 
-```
-
-```{r}
-#| fig-cap: "Effects of HC on infaunal community stability"
-#| layout: [[50,50], [50,50], [50,50]]
-
-tar_read(bdinfpc1)
-tar_read(bdinfpc2)
-tar_read(rdinfpc1)
-tar_read(rdinfpc2)
-tar_read(rpinfpc1)
-tar_read(rpinfpc2)
 ```
 
 ### Interstitial fauna
@@ -1207,16 +1037,5 @@ jtools::export_summs(
 )
 ```
 
-```{r}
-#| fig-cap: "Effects of HC on intersitial community stability"
-#| layout: [[50,50], [50,50], [50,50]]
-
-tar_read(bdintpc1)
-tar_read(bdintpc2)
-tar_read(rdintpc1)
-tar_read(rdintpc2)
-tar_read(rpintpc1)
-tar_read(rpintpc2)
-```
 :::
 :::

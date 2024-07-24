@@ -1,0 +1,468 @@
+---
+title: "models"
+author: 
+  - Victor L. Jardim
+format:
+  # html:
+    toc: true
+    toc-title: Contents
+    toc-location: left
+    toc-depth: 5
+    toc-expand: true
+    theme: minty
+    self-contained: true
+    embed-resources: true
+    code-fold: true
+    code-overflow: wrap
+    code-tools: true
+    fig-align: center
+    tbl-cap-location: top
+    fig-cap-location: bottom
+    page-layout: full
+    sidebar: true
+editor_options: 
+  chunk_output_type: console  
+execute: 
+  cache: refresh
+---
+
+```{r}
+#| include: false
+library(dplyr)
+library(targets)
+library(ggplot2)
+library(plotly)
+library(vegan)
+library(lme4)
+library(jtools)
+library(sandwich)
+library(fixest)
+library(broom)
+library(lmtest)
+library(pbkrtest)
+library(merDeriv)
+source("R/upset_vp_Victor.R")
+
+```
+# System and models
+
+![Real system](figures/system.png)
+
+![Two-Way Econometric Fixed Effects model](figures/TWFE.png)
+
+![Group Mean Covariate Model](figures/gm.png)
+# Richness models
+
+## Naive, mixed effects and fixed effects models
+
+```{r}
+tar_load(alphamod)
+alphamod <- alphamod %>% mutate(across(c(PC1_score, PC2_score, Depth, Fetch_max, Current_mean, T_mean, OM), scale)) %>% mutate(SY = paste(.$Site, .$Year, sep = "_"))
+
+
+mod_naive <- lm(S.obs ~ PC1_score+PC2_score+PC1_score:PC2_score+Depth+OM+T_mean+Fetch_max, data = alphamod)
+
+mod_re <- lmer(S.obs ~ PC1_score+PC2_score+PC1_score:PC2_score+Depth+OM+T_mean+Fetch_max+(1|Site), data = alphamod)
+
+mod_fe <- lm(S.obs ~ PC1_score+PC2_score+PC1_score:PC2_score+Depth+OM+T_mean+Fetch_max+Site+Year, data = alphamod)
+
+mod_twfe <- lm(S.obs ~ PC1_score+PC2_score+PC1_score:PC2_score+Depth+OM+T_mean+Fetch_max+SY, data = alphamod)
+
+```
+
+```{r}
+#| fig-height: 10
+#| fig-width: 16
+export_summs(
+  mod_naive,
+  mod_re,
+  mod_fe,
+  mod_twfe,
+  model.names = c("naive", "re", "fe", "twfe" ),
+  scale = TRUE,
+  statistics = c(
+    N = "nobs",
+    DF = "df.residual",
+    AIC = "AIC",
+    BIC = "BIC",
+    `Marginal R2` = "r.squared.fixed",
+    `Conditional R2` = "r.squared",
+    `Adjusted R2` = "adj.r.squared",
+    `F` = "statistic",
+    `p-value` = "p.value"
+  ),
+  coefs = c(
+    "PC1" = "PC1_score",
+    "PC2" = "PC2_score",
+    # "PC1_site" = "PC1_site",
+    # "PC2_site" = "PC2_site",
+    # "PC1_sy" = "PC1_sy",
+    # "PC2_sy" = "PC2_sy",
+    "PC1:PC2" = "PC1_score:PC2_score",
+    "Fetch" = "Fetch_max",
+    # "Current" = "Current_mean",
+    "Organic matter" = "OM",
+    "Temperature" = "T_mean",
+    "Depth" = "Depth"),
+  robust =  "HC1", error_pos = "right"
+)
+
+(naivecoef <- coeftest(mod_naive, 
+         vcov = vcov(mod_fe,
+                       # cluster =  ~ Site,
+                       type = "HC1")) |>
+tidy() |>
+      filter(term %in% c(
+      "PC1_score",
+      "PC2_score",
+      "PC1_score:PC2_score",
+      "Fetch_max",
+      "Current_mean",
+      "OM",
+      "T_mean",
+      "Depth" = "Depth"))
+  |>
+  mutate(model = "naive"))
+(recoef <- tidy(mod_re) |>
+      filter(term %in% c(
+      "PC1_score",
+      "PC2_score",
+      "PC1_score:PC2_score",
+      "Fetch_max",
+      # "Current_mean",
+      "OM",
+      "T_mean",
+      "Depth" = "Depth"))
+  |>
+  mutate(model = "re") %>% 
+  mutate(std.error = sqrt(diag(sandwich(mod_re, bread = bread(mod_re, full = TRUE),
+                 mean = meat(mod_re, level = 2)))[2:8])) %>% 
+  select(-effect:-group))
+
+coeftest(mod_fe, 
+         vcov = vcovCL(mod_fe,
+                       cluster =  ~ Site,
+                       type = "HC1")) |>
+  tidy() |>
+  filter(term %in% c(
+    "PC1_score",
+    "PC2_score",
+    "PC1_score:PC2_score",
+    "Fetch_max",
+    # "Current_mean",
+    "OM",
+    "T_mean",
+    "Depth" = "Depth"))
+
+(fecoef <- coeftest(mod_fe, 
+         vcov = vcovCL(mod_fe,
+                       cluster =  ~ Site + Year,
+                       type = "HC1")) |>
+  tidy() |>
+  filter(term %in% c(
+    "PC1_score",
+    "PC2_score",
+    "PC1_score:PC2_score",
+    "Fetch_max",
+    # "Current_mean",
+    "OM",
+    "T_mean",
+    "Depth" = "Depth")) |>
+  mutate(model = "fe"))
+
+(twfecoef <- coeftest(mod_twfe, 
+         vcov = vcovCL(mod_twfe,
+                       cluster =  ~ Site + Year,
+                       type = "HC1")) |>
+tidy() |>
+      filter(term %in% c(
+      "PC1_score",
+      "PC2_score",
+      "PC1_score:PC2_score",
+      "Fetch_max",
+      # "Current_mean",
+      "OM",
+      "T_mean",
+    "Depth" = "Depth"))
+  |>
+  mutate(model = "twfe"))
+
+coefs <- naivecoef %>% bind_rows(recoef, fecoef) %>% 
+  mutate(term = factor(term, levels = c("PC1_score",
+      "PC2_score",
+      "PC1_score:PC2_score",
+      "Fetch_max",
+      # "Current_mean",
+      "OM",
+      "T_mean",
+      "Depth" = "Depth")),
+      model = factor(model, levels = c("naive", "re", "fe")))
+
+ggplot(coefs, aes(x = estimate, y = term, colour = model, shape = model))+ 
+  geom_pointrange(aes(xmin = estimate-(1.96*std.error), xmax = estimate+(1.96*std.error)), position = position_dodge2(.5, reverse = TRUE), linewidth = .75)+
+  geom_vline(xintercept = 0, linetype="dashed")+
+  scale_y_discrete(limits = rev)+
+  theme_light()
+```
+## Naive, Grouped Mean Covariate, and Two-way grouped mean covariate models
+```{r}
+#| fig-height: 10
+#| fig-width: 16
+alphamod <- alphamod %>%
+  group_by(Site) %>% 
+  mutate(PC1_site = mean(PC1_score),
+         PC2_site = mean(PC2_score)
+         ) %>% 
+  ungroup() %>% 
+  group_by(Year) %>% 
+  mutate(PC1_y = mean(PC1_score),
+         PC2_y = mean(PC2_score)) %>% 
+  ungroup() %>% 
+  group_by(Point) %>% 
+  mutate(PC1_point = mean(PC1_score),
+         PC2_point = mean(PC2_score)) %>% 
+  ungroup()
+  
+mod_gmcov <- lmer(S.obs ~ PC1_score+ PC1_site + PC1_score:PC2_score+ PC2_score+ PC2_site + PC1_site:PC2_site+ Depth+Mud+T_mean+Fetch_max + (1|Site) + (1|Year), data = alphamod)
+mod_fegmcov <- lmer(S.obs ~ PC1_score+ PC1_site + PC1_score:PC2_score+ PC2_score+ PC2_site  + PC1_site:PC2_site + Depth+OM+T_mean+Fetch_max + (1|Site) + Year, data = alphamod)
+mod_twgmcov <- lmer(S.obs ~ PC1_score+ PC1_site + PC1_score:PC2_score+ PC2_score+ PC2_site + PC1_site:PC2_site +PC1_y + PC2_y + Depth+OM+T_mean+Fetch_max  + (1|Site) + (1|Year), data = alphamod)
+
+export_summs(
+  mod_naive,
+  mod_gmcov,
+  mod_fegmcov,
+  mod_twgmcov,
+  model.names = c("naive", "gmcov", "fegmcov", "twgmcov" ),
+  scale = TRUE,
+  statistics = c(
+    N = "nobs",
+    DF = "df.residual",
+    AIC = "AIC",
+    BIC = "BIC",
+    `Marginal R2` = "r.squared.fixed",
+    `Conditional R2` = "r.squared",
+    `Adjusted R2` = "adj.r.squared",
+    `F` = "statistic",
+    `p-value` = "p.value"
+  ),
+  coefs = c(
+    "PC1" = "PC1_score",
+    "PC2" = "PC2_score",
+    "PC1_site" = "PC1_site",
+    "PC2_site" = "PC2_site",
+    "PC1_y" = "PC1_y",
+    "PC2_y" = "PC2_y",
+    "PC1:PC2" = "PC1_score:PC2_score",
+    "PC1_site:PC2_site" = "PC1_site:PC2_site",
+    "Fetch" = "Fetch_max",
+    # "Current" = "Current_mean",
+    "Organic matter" = "OM",
+    "Temperature" = "T_mean")
+)
+
+gmcoef <- tidy(mod_gmcov) |>
+      filter(term %in% c(
+      "PC1_score",
+      "PC2_score",
+      "PC1_score:PC2_score",
+      "PC1_site",
+      "PC2_site",
+      "PC1_site:PC2_site",
+      "Fetch_max",
+      # "Current_mean",
+      "OM",
+      "T_mean",
+      "Depth" = "Depth")) |>
+  mutate(model = "gmcov") %>% 
+  select(-effect:-group)
+
+fegmcoef <- tidy(mod_fegmcov) |>
+      filter(term %in% c(
+      "PC1_score",
+      "PC2_score",
+      "PC1_score:PC2_score",
+      "PC1_site",
+      "PC2_site",
+      "PC1_site:PC2_site",
+      "Fetch_max",
+      # "Current_mean",
+      "OM",
+      "T_mean",
+      "Depth" = "Depth")) |>
+  mutate(model = "fegmcov") %>% 
+  select(-effect:-group)
+
+twgmcoef <- tidy(mod_twgmcov) |>
+      filter(term %in% c(
+      "PC1_score",
+      "PC2_score",
+      "PC1_score:PC2_score",
+      "PC1_site",
+      "PC2_site",
+      "PC1_site:PC2_site",
+      "Fetch_max",
+      # "Current_mean",
+      "OM",
+      "T_mean",
+      "Depth" = "Depth")) |>
+  mutate(model = "twgmcov") %>% 
+  select(-effect:-group)
+
+
+coefs <- naivecoef %>% bind_rows(recoef, fecoef, gmcoef, fegmcoef) %>% 
+  mutate(term = factor(term, levels = c("PC1_score",
+      "PC2_score",
+      "PC1_score:PC2_score",
+      "PC1_site",
+      "PC2_site",
+      "PC1_site:PC2_site",
+      "Fetch_max",
+      # "Current_mean",
+      "OM",
+      "T_mean",
+      "Depth")),
+      model = factor(model, levels = c("naive", "re", "fe", "gmcov", "fegmcov")))
+ggplot(coefs, aes(x = estimate, y = term, colour = model, shape = model))+ 
+    geom_vline(xintercept = 0, linetype="dashed")+
+  geom_pointrange(aes(xmin = estimate-std.error, xmax = estimate+std.error), position = position_dodge2(.5, reverse = TRUE))+
+  scale_y_discrete(limits = rev)+
+  theme_light()
+```
+
+# Density models
+```{r}
+dens_naive <- lm(log(Fauna_Density) ~ PC1_score+PC2_score+PC1_score:PC2_score+Depth+OM+T_mean+Fetch_max, data = alphamod)
+
+dens_re <- lmer(log(Fauna_Density) ~ PC1_score+PC2_score+PC1_score:PC2_score+Depth+OM+T_mean+Fetch_max+(1|Site), data = alphamod)
+
+dens_fe <- lm(log(Fauna_Density) ~ PC1_score+PC2_score+PC1_score:PC2_score+Depth+OM+T_mean+Fetch_max+Site+Year, data = alphamod)
+
+dens_twfe <- lm(log(Fauna_Density) ~ PC1_score+PC2_score+PC1_score:PC2_score+Depth+OM+T_mean+Fetch_max+SY, data = alphamod)
+
+dens_gmcov <- lmer(log(Fauna_Density) ~ PC1_score+ PC1_site + PC1_score:PC2_score+ PC2_score+ PC2_site + Depth+OM+T_mean+Fetch_max + (1|Site) + (1|Year), data = alphamod)
+
+dens_fegmcov <- lmer(log(Fauna_Density) ~ PC1_score+ PC1_site + PC1_score:PC2_score+ PC2_score+ PC2_site + Depth+OM+T_mean+Fetch_max + (1|Site) + Year, data = alphamod)
+
+dens_twgmcov <- lmer(log(Fauna_Density) ~ PC1_score+ PC1_site + PC1_score:PC2_score+ PC2_score+ PC2_site + PC1_y + PC2_y + Depth+OM+T_mean+Fetch_max  + (1|Site) + (1|Year), data = alphamod)
+
+(naivecoef <- coeftest(dens_naive, 
+         vcov = vcov(dens_fe,
+                       # cluster =  ~ Site,
+                       type = "HC1")) |>
+tidy() |>
+      filter(term %in% c(
+      "PC1_score",
+      "PC2_score",
+      "PC1_score:PC2_score",
+      "Fetch_max",
+      "Current_mean",
+      "OM",
+      "T_mean"))
+  |>
+  mutate(model = "naive"))
+(recoef <- tidy(dens_re) |>
+      filter(term %in% c(
+      "PC1_score",
+      "PC2_score",
+      "PC1_score:PC2_score",
+      "Fetch_max",
+      # "Current_mean",
+      "OM",
+      "T_mean"))
+  |>
+  mutate(model = "re") %>% 
+  select(-effect:-group))
+gmcoef <- tidy(dens_gmcov) |>
+      filter(term %in% c(
+      "PC1_score",
+      "PC2_score",
+      "PC1_score:PC2_score",
+      "PC1_site",
+      "PC2_site",
+      "Fetch_max",
+      # "Current_mean",
+      "OM",
+      "T_mean")) |>
+  mutate(model = "gmcov") %>% 
+  select(-effect:-group)
+
+fegmcoef <- tidy(dens_fegmcov) |>
+      filter(term %in% c(
+      "PC1_score",
+      "PC2_score",
+      "PC1_score:PC2_score",
+      "PC1_site",
+      "PC2_site",
+      "Fetch_max",
+      # "Current_mean",
+      "OM",
+      "T_mean")) |>
+  mutate(model = "fegmcov") %>% 
+  select(-effect:-group)
+
+twgmcoef <- tidy(dens_twgmcov) |>
+      filter(term %in% c(
+      "PC1_score",
+      "PC2_score",
+      "PC1_score:PC2_score",
+      "PC1_site",
+      "PC2_site",
+      "Fetch_max",
+      # "Current_mean",
+      "OM",
+      "T_mean")) |>
+  mutate(model = "twgmcov") %>% 
+  select(-effect:-group)
+
+(fecoef <- coeftest(dens_fe, 
+         vcov = vcovCL(dens_fe,
+                       cluster =  ~ Site + Year,
+                       type = "HC1")) |>
+  tidy() |>
+  filter(term %in% c(
+    "PC1_score",
+    "PC2_score",
+    "PC1_score:PC2_score",
+    "Fetch_max",
+    # "Current_mean",
+    "OM",
+    "T_mean")) |>
+  mutate(model = "fe"))
+
+(twfecoef <- coeftest(dens_twfe, 
+         vcov = vcovCL(dens_twfe,
+                       cluster =  ~ Site + Year,
+                       type = "HC1")) |>
+tidy() |>
+      filter(term %in% c(
+      "PC1_score",
+      "PC2_score",
+      "PC1_score:PC2_score",
+      "Fetch_max",
+      # "Current_mean",
+      "OM",
+      "T_mean"))
+  |>
+  mutate(model = "twfe"))
+
+coefdens <- naivecoef %>% bind_rows(recoef, fecoef, twfecoef, gmcoef, fegmcoef, twgmcoef) %>% 
+  mutate(term = factor(term, levels = c("PC1_score",
+      "PC2_score",
+      "PC1_score:PC2_score",
+      "PC1_site",
+      "PC2_site",
+      "Fetch_max",
+      # "Current_mean",
+      "OM",
+      "T_mean")),
+      model = factor(model, levels = c("naive", "re", "fe", "twfe", "gmcov", "fegmcov", "twgmcov")))
+
+ggplot(coefdens, aes(x = estimate, y = term, colour = model))+
+  geom_vline(xintercept = 0, linetype="dashed")+
+  geom_pointrange(aes(xmin = estimate-std.error, xmax = estimate+std.error), position = position_dodge2(.6, reverse = TRUE))+
+  scale_y_discrete(limits = rev)+
+  theme_light()
+```
+
+
+

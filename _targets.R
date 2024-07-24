@@ -217,7 +217,7 @@ list(
                            method = lm
                )+
                ylab("Species Richness")+
-               xlab("Rhodolith Complexity (PC1)")+
+               xlab("Nodule Complexity (PC1)")+
                scale_y_continuous(breaks = c(0, 25, 50, 75, 100, 125))+
                scale_x_continuous(breaks = c(-1, -.5, 0, .5, 1))+
                theme(legend.title = element_text(face = "bold",
@@ -232,38 +232,6 @@ list(
                guides(fill = guide_legend(title.position = "top"))),
   tar_target(modfixrich2, lm(data = alphamod, formula = S.obs ~ PC2_score)),
   tar_target(modfixrichpoly2, lm(data = alphamod, formula = S.obs ~ poly(PC2_score,2))),
-  tar_target(figure3, ggplot(data = alphamod, aes(x = PC2_score,
-                                                  y = S.obs,
-                                                  colour = Site))+
-               scale_color_manual(values = alpha(pal, .4)) +
-               scale_fill_manual(values = pal) +
-               geom_violin(aes(group = Point,
-                               fill = Site),
-                           width = .08,
-                           alpha = .5,
-                           # trim = FALSE,
-                           draw_quantiles = .5)+
-               geom_point(alpha = .6, 
-                          size = 2.5)+
-               geom_smooth(colour = "gray45", 
-                           method = lm
-               )+
-               ylab("Species Richness")+
-               xlab("Bed Complexity (PC2)")+
-               scale_y_continuous(breaks = c(0, 25, 50, 75, 100, 125))+
-               scale_x_continuous(breaks = c(-.6, -.4, -.2, 0, .2, .4, .6))+
-               theme(legend.title = element_text(face = "bold",
-                                                 size = 22),
-                     legend.text = element_text(size = 20),
-                     legend.background = element_blank(),
-                     legend.box.background = element_blank(),
-                     legend.key = element_blank(),
-                     legend.position = "top",
-                     axis.text = element_text(size = 20),
-                     axis.title = element_text(size =22,
-                                               face = "bold")) +
-               guides(fill = guide_legend(title.position = "top"))),
-  
   tar_target(modfixrich12, lm(data = alphamod, formula = S.obs ~ PC1_score * PC2_score)),
   tar_target(modfixrichpoly12, lm(data = alphamod, formula = S.obs ~ poly(PC1_score,2) * poly(PC2_score,2))),
   tar_target(modranrich12, lme4::lmer(data = alphamod, formula = S.obs ~ PC1_score * PC2_score + (1|Site))),
@@ -285,7 +253,7 @@ list(
         "S ~ Complexity + Environment + (1|Site)"
       ),
       coefs = c(
-        "Rhodolith complexity (PC1)" = "PC1_score", 
+        "Nodule complexity (PC1)" = "PC1_score", 
         "Bed complexity (PC2)" = "PC2_score",
         "PC1:PC2" = "PC1_score:PC2_score",
         "Depth" =  "Depth",
@@ -311,6 +279,7 @@ list(
         ) +
         guides(colour = guide_legend(title.position = "top"))
     ),
+  tar_target(figure2a, s_surfplot(modrrsel, pal, "Species richness <br> (marginal predictions)")),
   
       #--- by phylum ----
   tar_target(modfrann, lm(data = alphamod, formula = S.obs_Annelida ~ PC1_score * PC2_score)),
@@ -322,185 +291,9 @@ list(
   tar_target(modfrmol, lm(data = alphamod, formula = S.obs_Mollusca ~ PC1_score * PC2_score)),
   tar_target(modrrmol, lme4::lmer(data = alphamod, formula = S.obs_Mollusca ~ PC1_score * PC2_score + (1|Site))),
   
-  tar_target(annrichpc1, ggplot(data = alphamod, aes(x = PC1_score,
-                                                     y = S.obs_Annelida,
-                                                     colour = Site))+
-               scale_color_manual(values = alpha(pal, .4)) +
-               scale_fill_manual(values = pal) +
-               geom_violin(aes(group = Point,
-                               fill = Site),
-                           width = .08,
-                           alpha = .5,
-                           # trim = FALSE,
-                           draw_quantiles = .5)+
-               geom_point(alpha = .6, 
-                          size = 2.5)+
-               geom_smooth(colour = "gray45", 
-                           method = lm
-               )+
-               ylab("Annelid Richness")+
-               xlab("Rhodolith Complexity (PC1)")+
-               
-               
-               theme(legend.title = element_text(face = "bold",
-                                                 size = 22),
-                     legend.text = element_text(size = 20),
-                     legend.background = element_blank(),
-                     legend.box.background = element_blank(),
-                     legend.key = element_blank(),
-                     axis.text = element_text(size = 20),
-                     axis.title = element_text(size =22,
-                                               face = "bold")) +
-               guides(fill = guide_legend(title.position = "top"))),
-  tar_target(annrichpc2, ggplot(data = alphamod, aes(x = PC2_score,
-                                                     y = S.obs_Annelida,
-                                                     colour = Site))+
-               scale_color_manual(values = alpha(pal, .4)) +
-               scale_fill_manual(values = pal) +
-               geom_violin(aes(group = Point,
-                               fill = Site),
-                           width = .08,
-                           alpha = .5,
-                           # trim = FALSE,
-                           draw_quantiles = .5)+
-               geom_point(alpha = .6, 
-                          size = 2.5)+
-               geom_smooth(colour = "gray45", 
-                           method = lm
-               )+
-               ylab("Annelid Richness")+
-               xlab("Bed Complexity (PC2)")+
-               
-               
-               theme(legend.title = element_text(face = "bold",
-                                                 size = 22),
-                     legend.text = element_text(size = 20),
-                     legend.background = element_blank(),
-                     legend.box.background = element_blank(),
-                     legend.key = element_blank(),
-                     axis.text = element_text(size = 20),
-                     axis.title = element_text(size =22,
-                                               face = "bold")) +
-               guides(fill = guide_legend(title.position = "top"))),
-  tar_target(artrichpc1, ggplot(data = alphamod, aes(x = PC1_score,
-                                                     y = S.obs_Interstice,
-                                                     colour = Site))+
-               scale_color_manual(values = alpha(pal, .4)) +
-               scale_fill_manual(values = pal) +
-               geom_violin(aes(group = Point,
-                               fill = Site),
-                           width = .08,
-                           alpha = .5,
-                           # trim = FALSE,
-                           draw_quantiles = .5)+
-               geom_point(alpha = .6, 
-                          size = 2.5)+
-               geom_smooth(colour = "gray45", 
-                           method = lm
-               )+
-               ylab("Arthropod Richness")+
-               xlab("Rhodolith Complexity (PC1)")+
-
-               theme(legend.title = element_text(face = "bold",
-                                                 size = 22),
-                     legend.text = element_text(size = 20),
-                     legend.background = element_blank(),
-                     legend.box.background = element_blank(),
-                     legend.key = element_blank(),
-                     axis.text = element_text(size = 20),
-                     axis.title = element_text(size =22,
-                                               face = "bold")) +
-               guides(fill = guide_legend(title.position = "top"))),
-  tar_target(artrichpc2, ggplot(data = alphamod, aes(x = PC2_score,
-                                                     y = S.obs_Interstice,
-                                                     colour = Site))+
-               scale_color_manual(values = alpha(pal, .4)) +
-               scale_fill_manual(values = pal) +
-               geom_violin(aes(group = Point,
-                               fill = Site),
-                           width = .08,
-                           alpha = .5,
-                           # trim = FALSE,
-                           draw_quantiles = .5)+
-               geom_point(alpha = .6, 
-                          size = 2.5)+
-               geom_smooth(colour = "gray45", 
-                           method = lm
-               )+
-               ylab("Arthropod Richness")+
-               xlab("Bed Complexity (PC2)")+
-               
-               
-               theme(legend.title = element_text(face = "bold",
-                                                 size = 22),
-                     legend.text = element_text(size = 20),
-                     legend.background = element_blank(),
-                     legend.box.background = element_blank(),
-                     legend.key = element_blank(),
-                     axis.text = element_text(size = 20),
-                     axis.title = element_text(size =22,
-                                               face = "bold")) +
-               guides(fill = guide_legend(title.position = "top"))),
-  tar_target(molrichpc1, ggplot(data = alphamod, aes(x = PC1_score,
-                                                     y = S.obs_Mollusca,
-                                                     colour = Site))+
-               scale_color_manual(values = alpha(pal, .4)) +
-               scale_fill_manual(values = pal) +
-               geom_violin(aes(group = Point,
-                               fill = Site),
-                           width = .08,
-                           alpha = .5,
-                           # trim = FALSE,
-                           draw_quantiles = .5)+
-               geom_point(alpha = .6, 
-                          size = 2.5)+
-               geom_smooth(colour = "gray45", 
-                           method = lm
-               )+
-               ylab("Mollusca Species Richness")+
-               xlab("Rhodolith Complexity (PC1)")+
-               
-               
-               theme(legend.title = element_text(face = "bold",
-                                                 size = 22),
-                     legend.text = element_text(size = 20),
-                     legend.background = element_blank(),
-                     legend.box.background = element_blank(),
-                     legend.key = element_blank(),
-                     axis.text = element_text(size = 20),
-                     axis.title = element_text(size =22,
-                                               face = "bold")) +
-               guides(fill = guide_legend(title.position = "top"))),
-  tar_target(molrichpc2, ggplot(data = alphamod, aes(x = PC2_score,
-                                                     y = S.obs_Mollusca,
-                                                     colour = Site))+
-               scale_color_manual(values = alpha(pal, .4)) +
-               scale_fill_manual(values = pal) +
-               geom_violin(aes(group = Point,
-                               fill = Site),
-                           width = .08,
-                           alpha = .5,
-                           # trim = FALSE,
-                           draw_quantiles = .5)+
-               geom_point(alpha = .6, 
-                          size = 2.5)+
-               geom_smooth(colour = "gray45", 
-                           method = lm
-               )+
-               ylab("Mollusca Species Richness")+
-               xlab("Bed Complexity (PC2)")+
-               
-               
-               theme(legend.title = element_text(face = "bold",
-                                                 size = 22),
-                     legend.text = element_text(size = 20),
-                     legend.background = element_blank(),
-                     legend.box.background = element_blank(),
-                     legend.key = element_blank(),
-                     axis.text = element_text(size = 20),
-                     axis.title = element_text(size =22,
-                                               face = "bold")) +
-               guides(fill = guide_legend(title.position = "top"))),
+  tar_target(annrich, s_surfplot(modrrann, pal, "Annelid richness <br> (marginal predictions)")),
+  tar_target(artrich, s_surfplot(modrrart, pal, "Arthropod richness <br> (marginal predictions)")),
+  tar_target(molrich, s_surfplot(modrrmol, pal, "Mollusc richness <br> (marginal predictions)")),
       #--- by trait ----
   tar_target(modfrepi, lm(data = alphamod, formula = S.obs_Epifauna ~ PC1_score * PC2_score)),
   tar_target(modrrepi, lme4::lmer(data = alphamod, formula = S.obs_Epifauna ~ PC1_score * PC2_score + (1|Site))),
@@ -511,271 +304,34 @@ list(
   tar_target(modfrint, lm(data = alphamod, formula = S.obs_Interstice ~ PC1_score * PC2_score)),
   tar_target(modrrint, lme4::lmer(data = alphamod, formula = S.obs_Interstice ~ PC1_score * PC2_score + (1|Site))),
   
-  tar_target(infrichpc1, ggplot(data = alphamod, aes(x = PC1_score,
-                                                     y = S.obs_Infauna,
-                                                     colour = Site))+
-               scale_color_manual(values = alpha(pal, .4)) +
-               scale_fill_manual(values = pal) +
-               geom_violin(aes(group = Point,
-                               fill = Site),
-                           width = .08,
-                           alpha = .5,
-                           # trim = FALSE,
-                           draw_quantiles = .5)+
-               geom_point(alpha = .6, 
-                          size = 2.5)+
-               geom_smooth(colour = "gray45", 
-                           method = lm
-               )+
-               ylab("Infaunal Density")+
-               xlab("Rhodolith Complexity (PC1)")+
-               
-               
-               theme(legend.title = element_text(face = "bold",
-                                                 size = 22),
-                     legend.text = element_text(size = 20),
-                     legend.background = element_blank(),
-                     legend.box.background = element_blank(),
-                     legend.key = element_blank(),
-                     axis.text = element_text(size = 20),
-                     axis.title = element_text(size =22,
-                                               face = "bold")) +
-               guides(fill = guide_legend(title.position = "top"))),
-  tar_target(infrichpc2, ggplot(data = alphamod, aes(x = PC2_score,
-                                                     y = S.obs_Infauna,
-                                                     colour = Site))+
-               scale_color_manual(values = alpha(pal, .4)) +
-               scale_fill_manual(values = pal) +
-               geom_violin(aes(group = Point,
-                               fill = Site),
-                           width = .08,
-                           alpha = .5,
-                           # trim = FALSE,
-                           draw_quantiles = .5)+
-               geom_point(alpha = .6, 
-                          size = 2.5)+
-               geom_smooth(colour = "gray45", 
-                           method = lm
-               )+
-               ylab("Infaunal Density")+
-               xlab("Bed Complexity (PC2)")+
-               
-               
-               theme(legend.title = element_text(face = "bold",
-                                                 size = 22),
-                     legend.text = element_text(size = 20),
-                     legend.background = element_blank(),
-                     legend.box.background = element_blank(),
-                     legend.key = element_blank(),
-                     axis.text = element_text(size = 20),
-                     axis.title = element_text(size =22,
-                                               face = "bold")) +
-               guides(fill = guide_legend(title.position = "top"))),
-  tar_target(intrichpc1, ggplot(data = alphamod, aes(x = PC1_score,
-                                                     y = S.obs_Interstice,
-                                                     colour = Site))+
-               scale_color_manual(values = alpha(pal, .4)) +
-               scale_fill_manual(values = pal) +
-               geom_violin(aes(group = Point,
-                               fill = Site),
-                           width = .08,
-                           alpha = .5,
-                           # trim = FALSE,
-                           draw_quantiles = .5)+
-               geom_point(alpha = .6, 
-                          size = 2.5)+
-               geom_smooth(colour = "gray45", 
-                           method = lm
-               )+
-               ylab("Interstitial Density")+
-               xlab("Rhodolith Complexity (PC1)")+
-               
-               
-               theme(legend.title = element_text(face = "bold",
-                                                 size = 22),
-                     legend.text = element_text(size = 20),
-                     legend.background = element_blank(),
-                     legend.box.background = element_blank(),
-                     legend.key = element_blank(),
-                     axis.text = element_text(size = 20),
-                     axis.title = element_text(size =22,
-                                               face = "bold")) +
-               guides(fill = guide_legend(title.position = "top"))),
-  tar_target(intrichpc2, ggplot(data = alphamod, aes(x = PC2_score,
-                                                     y = S.obs_Interstice,
-                                                     colour = Site))+
-               scale_color_manual(values = alpha(pal, .4)) +
-               scale_fill_manual(values = pal) +
-               geom_violin(aes(group = Point,
-                               fill = Site),
-                           width = .08,
-                           alpha = .5,
-                           # trim = FALSE,
-                           draw_quantiles = .5)+
-               geom_point(alpha = .6, 
-                          size = 2.5)+
-               geom_smooth(colour = "gray45", 
-                           method = lm
-               )+
-               ylab("Interstitial Density")+
-               xlab("Bed Complexity (PC2)")+
-               
-               
-               theme(legend.title = element_text(face = "bold",
-                                                 size = 22),
-                     legend.text = element_text(size = 20),
-                     legend.background = element_blank(),
-                     legend.box.background = element_blank(),
-                     legend.key = element_blank(),
-                     axis.text = element_text(size = 20),
-                     axis.title = element_text(size =22,
-                                               face = "bold")) +
-               guides(fill = guide_legend(title.position = "top"))),
-  tar_target(epirichpc1, ggplot(data = alphamod, aes(x = PC1_score,
-                                                     y = S.obs_Epifauna,
-                                                     colour = Site))+
-               scale_color_manual(values = alpha(pal, .4)) +
-               scale_fill_manual(values = pal) +
-               geom_violin(aes(group = Point,
-                               fill = Site),
-                           width = .08,
-                           alpha = .5,
-                           # trim = FALSE,
-                           draw_quantiles = .5)+
-               geom_point(alpha = .6, 
-                          size = 2.5)+
-               geom_smooth(colour = "gray45", 
-                           method = lm
-               )+
-               ylab("Epifaunal Density")+
-               xlab("Rhodolith Complexity (PC1)")+
-               
-               
-               theme(legend.title = element_text(face = "bold",
-                                                 size = 22),
-                     legend.text = element_text(size = 20),
-                     legend.background = element_blank(),
-                     legend.box.background = element_blank(),
-                     legend.key = element_blank(),
-                     axis.text = element_text(size = 20),
-                     axis.title = element_text(size =22,
-                                               face = "bold")) +
-               guides(fill = guide_legend(title.position = "top"))),
-  tar_target(epirichpc2, ggplot(data = alphamod, aes(x = PC2_score,
-                                                     y = S.obs_Epifauna,
-                                                     colour = Site))+
-               scale_color_manual(values = alpha(pal, .4)) +
-               scale_fill_manual(values = pal) +
-               geom_violin(aes(group = Point,
-                               fill = Site),
-                           width = .08,
-                           alpha = .5,
-                           # trim = FALSE,
-                           draw_quantiles = .5)+
-               geom_point(alpha = .6, 
-                          size = 2.5)+
-               geom_smooth(colour = "gray45", 
-                           method = lm
-               )+
-               ylab("Epifaunal Density")+
-               xlab("Bed Complexity (PC2)")+
-               
-               
-               theme(legend.title = element_text(face = "bold",
-                                                 size = 22),
-                     legend.text = element_text(size = 20),
-                     legend.background = element_blank(),
-                     legend.box.background = element_blank(),
-                     legend.key = element_blank(),
-                     axis.text = element_text(size = 20),
-                     axis.title = element_text(size =22,
-                                               face = "bold")) +
-               guides(fill = guide_legend(title.position = "top"))),
-  
-  
+  tar_target(epirich, s_surfplot(modrrepi, pal, "Epifauna richness <br> (marginal predictions)")),
+  tar_target(infrich, s_surfplot(modrrinf, pal, "Infauna richness <br> (marginal predictions)")),
+  tar_target(intrich, s_surfplot(modrrint, pal, "Interstitial fauna richness <br> (marginal predictions)")),
   
     #-- Density ----
   tar_target(modfixdens1, lm(data = alphamod, formula = log(Fauna_Density) ~ PC1_score)),
-  tar_target(totdenspc1, ggplot(data = alphamod, aes(x = PC1_score,
-                                                     y = Fauna_Density,
-                                                     colour = Site))+
-               scale_color_manual(values = alpha(pal, .4)) +
-               scale_fill_manual(values = pal) +
-               geom_violin(aes(group = Point,
-                               fill = Site),
-                           width = .08,
-                           alpha = .5,
-                           # trim = FALSE,
-                           draw_quantiles = .5)+
-               geom_point(alpha = .6, 
-                          size = 2.5)+
-               geom_smooth(colour = "gray45", 
-                           #method = lm
-               )+
-               ylab("Density of Total Macrofauna")+
-               xlab("Rhodolith Complexity (PC1)")+
-               scale_y_log10()+
-               scale_x_continuous(breaks = c(-1, -.5, 0, .5, 1))+
-               theme(legend.title = element_text(face = "bold",
-                                                 size = 22),
-                     legend.text = element_text(size = 20),
-                     legend.background = element_blank(),
-                     legend.box.background = element_blank(),
-                     legend.key = element_blank(),
-                     axis.text = element_text(size = 20),
-                     axis.title = element_text(size =22,
-                                               face = "bold")) +
-               guides(fill = guide_legend(title.position = "top"))),
   tar_target(modfixdens2, lm(data = alphamod, formula = log(Fauna_Density) ~ PC2_score)),
-  tar_target(figure2, ggplot(data = alphamod, aes(x = PC2_score,
-                                                  y = Fauna_Density,
-                                                  colour = Site))+
-               scale_color_manual(values = alpha(pal, .4)) +
-               scale_fill_manual(values = pal) +
-               geom_violin(aes(group = Point,
-                               fill = Site),
-                           width = .08,
-                           alpha = .5,
-                           # trim = FALSE,
-                           draw_quantiles = .5)+
-               geom_point(alpha = .6, 
-                          size = 2.5)+
-               geom_smooth(colour = "gray45", 
-                           method = lm
-               )+
-               ylab("Density of Total Macrofauna")+
-               xlab("Bed Complexity (PC2)")+
-               scale_y_log10()+
-               scale_x_continuous(breaks = c(-.6, -.4, -.2, 0, .2, .4, .6))+
-               theme(legend.title = element_text(face = "bold",
-                                                 size = 22),
-                     legend.text = element_text(size = 20),
-                     legend.background = element_blank(),
-                     legend.box.background = element_blank(),
-                     legend.key = element_blank(),
-                     axis.text = element_text(size = 20),
-                     axis.title = element_text(size =22,
-                                               face = "bold")) +
-               guides(fill = guide_legend(title.position = "top"))),
-  
   tar_target(modfixdens12, lm(data = alphamod, formula = log(Fauna_Density) ~ PC1_score * PC2_score)),
   tar_target(modrandens12, lme4::lmer(data = alphamod, formula = log(Fauna_Density) ~ PC1_score * PC2_score + (1|Site))),
   tar_target(densselR2, adespatial::forward.sel(alphamod %>% select(Fauna_Density), alphamod %>% select(Mud:Fetch_max, PC1_score, PC2_score))),
   tar_target(modfdsel, lm(formula = log(Fauna_Density) ~ PC1_score * PC2_score + Current_mean + Gravel + Depth + Fetch_max + T_mean + OM + Year, data = alphamod)),
   tar_target(modrdsel, lme4::lmer(formula = log(Fauna_Density) ~ PC1_score * PC2_score + Current_mean + Gravel + Depth + Fetch_max + T_mean + OM + Year + (1|Site), data = alphamod)),
+  tar_target(surfdens, dens_surfplot(modrdsel, pal, "Total density")),
  
       #--- by phylum ----
   tar_target(anndensselR2, adespatial::forward.sel(alphamod %>% select(Annelida), alphamod %>% select(Mud:Fetch_max, PC1_score, PC2_score))),
   tar_target(modfdann, lm(data = alphamod, formula = log(Annelida) ~ PC1_score * PC2_score + Fetch_max  + Depth + Mud + T_mean + OM + Year)),
   tar_target(modrdann, lme4::lmer(data = alphamod, formula = log(Annelida) ~ PC1_score * PC2_score + Fetch_max  + Depth + T_mean + Year + (1|Site))),
+  tar_target(surfann, dens_surfplot(modrdann, pal, "Annelid density")),
   
   tar_target(artdensselR2, adespatial::forward.sel(alphamod %>% select(Arthropoda), alphamod %>% select(Mud:Fetch_max, PC1_score, PC2_score))),
   tar_target(modfdart, lm(data = alphamod, formula = log(Arthropoda) ~ PC1_score * PC2_score + Current_mean + Fetch_max + Gravel + OM + Year)),
   tar_target(modrdart, lme4::lmer(data = alphamod, formula = log(Arthropoda) ~ PC1_score * PC2_score + Current_mean + Fetch_max + Gravel + OM + Year + (1|Site))),
-  
+  tar_target(surfart, dens_surfplot(modrdart, pal, "Arthropod density")),
   tar_target(moldensselR2, adespatial::forward.sel(alphamod %>% select(Mollusca), alphamod %>% select(Mud:Fetch_max, PC1_score, PC2_score))),
   tar_target(modfdmol, lm(data = alphamod, formula = log(Mollusca) ~ PC1_score * PC2_score + Gravel  + OM + T_mean + Depth + Year)),
   tar_target(modrdmol, lme4::lmer(data = alphamod, formula = log(Mollusca) ~ PC1_score * PC2_score + Gravel  + OM + T_mean + Depth + Year + (1|Site))),
+  tar_target(surfmol, dens_surfplot(modrdmol, pal, "Mollusc density")),
   tar_target(
     psdens,
     alpha.summs(
@@ -792,7 +348,7 @@ list(
       mod11 =modrdmol,
       pal = pal,
       coefs = c(
-        "Rhodolith complexity (PC1)" = "PC1_score", 
+        "Nodule complexity (PC1)" = "PC1_score", 
         "Bed complexity (PC2)" = "PC2_score",
         "PC1:PC2" = "PC1_score:PC2_score",
         "Depth" = "Depth",
@@ -808,203 +364,21 @@ list(
     ),
     ),
   
-  tar_target(anndenspc1, ggplot(data = alphamod, aes(x = PC1_score,
-                                                     y = Annelida,
-                                                     colour = Site))+
-               scale_color_manual(values = alpha(pal, .4)) +
-               scale_fill_manual(values = pal) +
-               geom_violin(aes(group = Point,
-                               fill = Site),
-                           width = .08,
-                           alpha = .5,
-                           # trim = FALSE,
-                           draw_quantiles = .5)+
-               geom_point(alpha = .6, 
-                          size = 2.5)+
-               geom_smooth(colour = "gray45", 
-                           method = lm
-               )+
-               ylab("Annelid Density")+
-               xlab("Rhodolith Complexity (PC1)")+
-               scale_y_log10()+
-               theme(legend.title = element_text(face = "bold",
-                                                 size = 22),
-                     legend.text = element_text(size = 20),
-                     legend.background = element_blank(),
-                     legend.box.background = element_blank(),
-                     legend.key = element_blank(),
-                     axis.text = element_text(size = 20),
-                     axis.title = element_text(size =22,
-                                               face = "bold")) +
-               guides(fill = guide_legend(title.position = "top"))),
- 
-   tar_target(anndenspc2, ggplot(data = alphamod, aes(x = PC2_score,
-                                                     y = Annelida,
-                                                     colour = Site))+
-               scale_color_manual(values = alpha(pal, .4)) +
-               scale_fill_manual(values = pal) +
-               geom_violin(aes(group = Point,
-                               fill = Site),
-                           width = .08,
-                           alpha = .5,
-                           # trim = FALSE,
-                           draw_quantiles = .5)+
-               geom_point(alpha = .6, 
-                          size = 2.5)+
-               geom_smooth(colour = "gray45", 
-                           method = lm
-               )+
-               ylab("Annelid Density")+
-               xlab("Bed Complexity (PC2)")+
-               scale_y_log10()+
-               
-               theme(legend.title = element_text(face = "bold",
-                                                 size = 22),
-                     legend.text = element_text(size = 20),
-                     legend.background = element_blank(),
-                     legend.box.background = element_blank(),
-                     legend.key = element_blank(),
-                     axis.text = element_text(size = 20),
-                     axis.title = element_text(size =22,
-                                               face = "bold")) +
-               guides(fill = guide_legend(title.position = "top"))),
-  
-  tar_target(artdenspc1, ggplot(data = alphamod, aes(x = PC1_score,
-                                                     y = Arthropoda,
-                                                     colour = Site))+
-               scale_color_manual(values = alpha(pal, .4)) +
-               scale_fill_manual(values = pal) +
-               geom_violin(aes(group = Point,
-                               fill = Site),
-                           width = .08,
-                           alpha = .5,
-                           # trim = FALSE,
-                           draw_quantiles = .5)+
-               geom_point(alpha = .6, 
-                          size = 2.5)+
-               geom_smooth(colour = "gray45", 
-                           method = lm
-               )+
-               ylab("Arthropod Density")+
-               xlab("Rhodolith Complexity (PC1)")+
-               scale_y_log10()+
-               
-               theme(legend.title = element_text(face = "bold",
-                                                 size = 22),
-                     legend.text = element_text(size = 20),
-                     legend.background = element_blank(),
-                     legend.box.background = element_blank(),
-                     legend.key = element_blank(),
-                     axis.text = element_text(size = 20),
-                     axis.title = element_text(size =22,
-                                               face = "bold")) +
-               guides(fill = guide_legend(title.position = "top"))),
-  tar_target(artdenspc2, ggplot(data = alphamod, aes(x = PC2_score,
-                                                     y = Arthropoda,
-                                                     colour = Site))+
-               scale_color_manual(values = alpha(pal, .4)) +
-               scale_fill_manual(values = pal) +
-               geom_violin(aes(group = Point,
-                               fill = Site),
-                           width = .08,
-                           alpha = .5,
-                           # trim = FALSE,
-                           draw_quantiles = .5)+
-               geom_point(alpha = .6, 
-                          size = 2.5)+
-               geom_smooth(colour = "gray45", 
-                           method = lm
-               )+
-               ylab("Arthropod Density")+
-               xlab("Bed Complexity (PC2)")+
-               scale_y_log10()+
-               
-               theme(legend.title = element_text(face = "bold",
-                                                 size = 22),
-                     legend.text = element_text(size = 20),
-                     legend.background = element_blank(),
-                     legend.box.background = element_blank(),
-                     legend.key = element_blank(),
-                     axis.text = element_text(size = 20),
-                     axis.title = element_text(size =22,
-                                               face = "bold")) +
-               guides(fill = guide_legend(title.position = "top"))),
-  tar_target(moldenspc1, ggplot(data = alphamod, aes(x = PC1_score,
-                                                     y = Mollusca,
-                                                     colour = Site))+
-               scale_color_manual(values = alpha(pal, .4)) +
-               scale_fill_manual(values = pal) +
-               geom_violin(aes(group = Point,
-                               fill = Site),
-                           width = .08,
-                           alpha = .5,
-                           # trim = FALSE,
-                           draw_quantiles = .5)+
-               geom_point(alpha = .6, 
-                          size = 2.5)+
-               geom_smooth(colour = "gray45", 
-                           method = lm
-               )+
-               ylab("Mollusca Density")+
-               xlab("Rhodolith Complexity (PC1)")+
-               scale_y_log10()+
-               
-               theme(legend.title = element_text(face = "bold",
-                                                 size = 22),
-                     legend.text = element_text(size = 20),
-                     legend.background = element_blank(),
-                     legend.box.background = element_blank(),
-                     legend.key = element_blank(),
-                     axis.text = element_text(size = 20),
-                     axis.title = element_text(size =22,
-                                               face = "bold")) +
-               guides(fill = guide_legend(title.position = "top"))),
-  tar_target(moldenspc2, ggplot(data = alphamod, aes(x = PC2_score,
-                                                     y = Mollusca,
-                                                     colour = Site))+
-               scale_color_manual(values = alpha(pal, .4)) +
-               scale_fill_manual(values = pal) +
-               geom_violin(aes(group = Point,
-                               fill = Site),
-                           width = .08,
-                           alpha = .5,
-                           # trim = FALSE,
-                           draw_quantiles = .5)+
-               geom_point(alpha = .6, 
-                          size = 2.5)+
-               geom_smooth(colour = "gray45", 
-                           method = lm
-               )+
-               ylab("Mollusca Density")+
-               xlab("Bed Complexity (PC2)")+
-               scale_y_log10()+
-               
-               theme(legend.title = element_text(face = "bold",
-                                                 size = 22),
-                     legend.text = element_text(size = 20),
-                     legend.background = element_blank(),
-                     legend.box.background = element_blank(),
-                     legend.key = element_blank(),
-                     axis.text = element_text(size = 20),
-                     axis.title = element_text(size =22,
-                                               face = "bold")) +
-               guides(fill = guide_legend(title.position = "top"))),
-  
   
   
       #--- by trait ----
   tar_target(epidensselR2, adespatial::forward.sel(alphamod %>% select(Epifauna), alphamod %>% select(Mud:Fetch_max, PC1_score, PC2_score))),
   tar_target(modfdepi, lm(data = alphamod, formula = log(Epifauna) ~ PC1_score * PC2_score + Current_mean + Fetch_max  + OM + Gravel + T_mean + Year)),
   tar_target(modrdepi, lme4::lmer(data = alphamod, formula = log(Epifauna) ~ PC1_score * PC2_score + Current_mean + Fetch_max  + OM + Gravel + T_mean + Year +(1|Site))),
-  
+  tar_target(surfepi, dens_surfplot(modrdepi, pal, "Epifauna density")),
   tar_target(infdensselR2, adespatial::forward.sel(alphamod %>% select(Infauna), alphamod %>% select(Mud:Fetch_max, PC1_score, PC2_score))),
   tar_target(modfdinf, lm(data = alphamod, formula = log(Infauna) ~ PC1_score * PC2_score + Depth + T_sd + T_mean + Gravel + Year)),
   tar_target(modrdinf, lme4::lmer(data = alphamod, formula = log(Infauna) ~ PC1_score * PC2_score + Depth + T_sd + T_mean + Gravel + Year + (1|Site))),
-  
+  tar_target(surfinf, dens_surfplot(modrdinf, pal, "Infauna density")),
   tar_target(intdensselR2, adespatial::forward.sel(alphamod %>% select(Interstice), alphamod %>% select(Mud:Fetch_max, PC1_score, PC2_score))),
   tar_target(modfdint, lm(data = alphamod, formula = log(Interstice+1) ~ PC1_score * PC2_score + Gravel  + OM + Fetch_max + Mud + Year)),
   tar_target(modrdint, lme4::lmer(data = alphamod, formula = log(Interstice+1) ~ PC1_score * PC2_score + Gravel  + OM + Fetch_max + Mud + Year + (1|Site))),
-  
+  tar_target(surfint, dens_surfplot(modrdint, pal, "Interstitial fauna density")),
   tar_target(
     psdtrait,
     p.summs(
@@ -1018,7 +392,7 @@ list(
       modrdint,
       pal[c(2,9,8,10)],
       coefs = c(
-        "Rhodolith complexity (PC1)" = "PC1_score", 
+        "Nodule complexity (PC1)" = "PC1_score", 
         "Bed complexity (PC2)" = "PC2_score",
         "PC1:PC2" = "PC1_score:PC2_score",
         "Mean current velocity" = "Current_mean",
@@ -1034,190 +408,6 @@ list(
       model.names = c("1. Total macrofauna", "2. Epifauna", "3. Infauna", "4. Interstitial Fauna")
     )
   ),
-  
-  tar_target(epidenspc1, ggplot(data = alphamod, aes(x = PC1_score,
-                                                     y = Epifauna,
-                                                     colour = Site))+
-               scale_color_manual(values = alpha(pal, .4)) +
-               scale_fill_manual(values = pal) +
-               geom_violin(aes(group = Point,
-                               fill = Site),
-                           width = .08,
-                           alpha = .5,
-                           # trim = FALSE,
-                           draw_quantiles = .5)+
-               geom_point(alpha = .6, 
-                          size = 2.5)+
-               geom_smooth(colour = "gray45", 
-                           method = lm
-               )+
-               ylab("Density of Epifauna")+
-               xlab("Rhodolith Complexity (PC1)")+
-               scale_y_log10()+
-               theme(legend.title = element_text(face = "bold",
-                                                 size = 22),
-                     legend.text = element_text(size = 20),
-                     legend.background = element_blank(),
-                     legend.box.background = element_blank(),
-                     legend.key = element_blank(),
-                     axis.text = element_text(size = 20),
-                     axis.title = element_text(size =22,
-                                               face = "bold")) +
-               guides(fill = guide_legend(title.position = "top"))),
-  
-  tar_target(epidenspc2, ggplot(data = alphamod, aes(x = PC2_score,
-                                                     y = Epifauna,
-                                                     colour = Site))+
-               scale_color_manual(values = alpha(pal, .4)) +
-               scale_fill_manual(values = pal) +
-               geom_violin(aes(group = Point,
-                               fill = Site),
-                           width = .08,
-                           alpha = .5,
-                           # trim = FALSE,
-                           draw_quantiles = .5)+
-               geom_point(alpha = .6, 
-                          size = 2.5)+
-               geom_smooth(colour = "gray45", 
-                           method = lm
-               )+
-               ylab("Density of Epifauna")+
-               xlab("Bed Complexity (PC2)")+
-               scale_y_log10()+
-               
-               theme(legend.title = element_text(face = "bold",
-                                                 size = 22),
-                     legend.text = element_text(size = 20),
-                     legend.background = element_blank(),
-                     legend.box.background = element_blank(),
-                     legend.key = element_blank(),
-                     axis.text = element_text(size = 20),
-                     axis.title = element_text(size =22,
-                                               face = "bold")) +
-               guides(fill = guide_legend(title.position = "top"))),
-  
-  tar_target(infdenspc1, ggplot(data = alphamod, aes(x = PC1_score,
-                                                     y = Infauna,
-                                                     colour = Site))+
-               scale_color_manual(values = alpha(pal, .4)) +
-               scale_fill_manual(values = pal) +
-               geom_violin(aes(group = Point,
-                               fill = Site),
-                           width = .08,
-                           alpha = .5,
-                           # trim = FALSE,
-                           draw_quantiles = .5)+
-               geom_point(alpha = .6, 
-                          size = 2.5)+
-               geom_smooth(colour = "gray45", 
-                           method = lm
-               )+
-               ylab("Density of Infauna")+
-               xlab("Rhodolith Complexity (PC1)")+
-               scale_y_log10()+
-               
-               theme(legend.title = element_text(face = "bold",
-                                                 size = 22),
-                     legend.text = element_text(size = 20),
-                     legend.background = element_blank(),
-                     legend.box.background = element_blank(),
-                     legend.key = element_blank(),
-                     axis.text = element_text(size = 20),
-                     axis.title = element_text(size =22,
-                                               face = "bold")) +
-               guides(fill = guide_legend(title.position = "top"))),
-  tar_target(infdenspc2, ggplot(data = alphamod, aes(x = PC2_score,
-                                                     y = Infauna,
-                                                     colour = Site))+
-               scale_color_manual(values = alpha(pal, .4)) +
-               scale_fill_manual(values = pal) +
-               geom_violin(aes(group = Point,
-                               fill = Site),
-                           width = .08,
-                           alpha = .5,
-                           # trim = FALSE,
-                           draw_quantiles = .5)+
-               geom_point(alpha = .6, 
-                          size = 2.5)+
-               geom_smooth(colour = "gray45", 
-                           method = lm
-               )+
-               ylab("Density of Infauna")+
-               xlab("Bed Complexity (PC2)")+
-               scale_y_log10()+
-               
-               theme(legend.title = element_text(face = "bold",
-                                                 size = 22),
-                     legend.text = element_text(size = 20),
-                     legend.background = element_blank(),
-                     legend.box.background = element_blank(),
-                     legend.key = element_blank(),
-                     axis.text = element_text(size = 20),
-                     axis.title = element_text(size =22,
-                                               face = "bold")) +
-               guides(fill = guide_legend(title.position = "top"))),
-  tar_target(intdenspc1, ggplot(data = alphamod, aes(x = PC1_score,
-                                                     y = Interstice,
-                                                     colour = Site))+
-               scale_color_manual(values = alpha(pal, .4)) +
-               scale_fill_manual(values = pal) +
-               geom_violin(aes(group = Point,
-                               fill = Site),
-                           width = .08,
-                           alpha = .5,
-                           # trim = FALSE,
-                           draw_quantiles = .5)+
-               geom_point(alpha = .6, 
-                          size = 2.5)+
-               geom_smooth(colour = "gray45", 
-                           method = lm
-               )+
-               ylab("Density of Interstitial Fauna")+
-               xlab("Rhodolith Complexity (PC1)")+
-               scale_y_log10()+
-               
-               theme(legend.title = element_text(face = "bold",
-                                                 size = 22),
-                     legend.text = element_text(size = 20),
-                     legend.background = element_blank(),
-                     legend.box.background = element_blank(),
-                     legend.key = element_blank(),
-                     axis.text = element_text(size = 20),
-                     axis.title = element_text(size =22,
-                                               face = "bold")) +
-               guides(fill = guide_legend(title.position = "top"))),
-  
-  tar_target(intdenspc2, ggplot(data = alphamod, aes(x = PC2_score,
-                                                     y = Interstice,
-                                                     colour = Site))+
-               scale_color_manual(values = alpha(pal, .4)) +
-               scale_fill_manual(values = pal) +
-               geom_violin(aes(group = Point,
-                               fill = Site),
-                           width = .08,
-                           alpha = .5,
-                           # trim = FALSE,
-                           draw_quantiles = .5)+
-               geom_point(alpha = .6, 
-                          size = 2.5)+
-               geom_smooth(colour = "gray45", 
-                           method = lm
-               )+
-               ylab("Density of Intersitial Fauna")+
-               xlab("Bed Complexity (PC2)")+
-               scale_y_log10()+
-               
-               theme(legend.title = element_text(face = "bold",
-                                                 size = 22),
-                     legend.text = element_text(size = 20),
-                     legend.background = element_blank(),
-                     legend.box.background = element_blank(),
-                     legend.key = element_blank(),
-                     axis.text = element_text(size = 20),
-                     axis.title = element_text(size =22,
-                                               face = "bold")) +
-               guides(fill = guide_legend(title.position = "top"))),
-  
   
     #-- N2 ----
   tar_target(modfixN21, lm(data = alphamod, formula = N2 ~ PC1_score)),
@@ -1239,7 +429,7 @@ list(
                            method = lm
                )+
                ylab("N2")+
-               xlab("Rhodolith Complexity (PC1)")+
+               xlab("Nodule Complexity (PC1)")+
                #scale_y_continuous(breaks = c(0, 25, 50, 75, 100, 125))+
                #scale_x_continuous(breaks = c(-1, -.5, 0, .5, 1))+
                theme(legend.title = element_text(face = "bold",
@@ -1303,7 +493,7 @@ list(
         "N2 ~ Complexity + Environment + (1|Site)"
       ),
       coefs = c(
-        "Rhodolith complexity (PC1)" = "PC1_score", 
+        "Nodule complexity (PC1)" = "PC1_score", 
         "Bed complexity (PC2)" = "PC2_score",
         "PC1:PC2" = "PC1_score:PC2_score",
         "Gravel" = "Gravel",
@@ -1350,7 +540,7 @@ tar_target(totJpc1, ggplot(data = alphamod, aes(x = PC1_score,
                          method = lm
              )+
              ylab("Pielou's J")+
-             xlab("Rhodolith Complexity (PC1)")+
+             xlab("Nodule Complexity (PC1)")+
              scale_y_continuous(breaks = c(0, 25, 50, 75, 100, 125))+
              scale_x_continuous(breaks = c(-1, -.5, 0, .5, 1))+
              theme(legend.title = element_text(face = "bold",
@@ -1414,7 +604,7 @@ tar_target(
       "J ~ Complexity + Environment + (1|Site)"
     ),
     coefs = c(
-      "Rhodolith complexity (PC1)" = "PC1_score", 
+      "Nodule complexity (PC1)" = "PC1_score", 
       "Bed complexity (PC2)" = "PC2_score",
       "PC1:PC2" = "PC1_score:PC2_score",
       "Gravel" =  "Gravel",
@@ -1493,10 +683,10 @@ tar_target(
   
     #-- hierarchical partitioning ----
   tar_target(hierpartmain, hp_main(envcomp, bcdens)),
-  tar_target(upsetmain, upset_vp_victor(hierpartmain, cutoff = 0.005, int.var = "Complexity", pal = pal[1:8], title.cex = 22, axis.cex = 20, pch.size = 6, col.width = .8, effect.cex = 6)),
+  tar_target(upsetmain, upset_vp_victor(hierpartmain, cutoff = 0.008, int.var = "Complexity", pal = pal[1:8], title.cex = 22, axis.cex = 20, pch.size = 6, col.width = .8, effect.cex = 6)),
   
   tar_target(hierpartsep, hp_sep(envcomp, bcdens)),
-  tar_target(upsetsep, upset_vp_victor(hierpartsep, cutoff = 0.005, int.var = "Rhodolith complexity", pal = pal, title.cex = 22, axis.cex = 20, pch.size = 6, col.width = .8, effect.cex = 6, int.col = 5)),
+  tar_target(upsetsep, upset_vp_victor(hierpartsep, cutoff = 0.005, int.var = "Nodule complexity", pal = pal, title.cex = 22, axis.cex = 20, pch.size = 6, col.width = .8, effect.cex = 6, int.col = 5)),
   #- temporal diversity ----
   tar_target(bdtot, bd.tot(fauna_dens, med_sel2)),
   tar_target(bdplot, bd.plot(bdtot, pal)),
@@ -1531,535 +721,32 @@ tar_target(
     #-- BD ~ PC1 * PC2 ----
       #--- Total fauna ----
   tar_target(modbdtot, lm(BDtotal ~ poly(PC1_score, 2) * PC2_score, bdtot)),
-  tar_target(bdtotpc1, ggplot(data = bdtot, aes(x = PC1_score,
-                                                     y = BDtotal,
-                                                     colour = Site))+
-               scale_color_manual(values = alpha(pal, .4)) +
-               geom_point(alpha = .6, 
-                          size = 2.5)+
-               geom_smooth(colour = "gray45", 
-                           method = "lm", 
-                           formula = y ~ poly(x,2)
-               )+
-               ylab("BDtotal")+
-               xlab("Rhodolith Complexity (PC1)")+
-               theme(legend.title = element_text(face = "bold",
-                                                 size = 22),
-                     legend.text = element_text(size = 20),
-                     legend.background = element_blank(),
-                     legend.box.background = element_blank(),
-                     legend.key = element_blank(),
-                     axis.text = element_text(size = 20),
-                     axis.title = element_text(size =22,
-                                               face = "bold")) +
-               guides(fill = guide_legend(title.position = "top"))),
-  tar_target(bdtotpc2, ggplot(data = bdtot, aes(x = PC2_score,
-                                                     y = BDtotal,
-                                                     colour = Site))+
-               scale_color_manual(values = alpha(pal, .4)) +
-               geom_point(alpha = .6, 
-                          size = 2.5)+
-               geom_smooth(colour = "gray45", 
-                           method = lm
-               )+
-               ylab("BDtotal")+
-               xlab("Bed Complexity (PC2)")+
-               theme(legend.title = element_text(face = "bold",
-                                                 size = 22),
-                     legend.text = element_text(size = 20),
-                     legend.background = element_blank(),
-                     legend.box.background = element_blank(),
-                     legend.key = element_blank(),
-                     axis.text = element_text(size = 20),
-                     axis.title = element_text(size =22,
-                                               face = "bold")) +
-               guides(fill = guide_legend(title.position = "top"))),
+  tar_target(fig3a, bd_surfplot(modbdtot, pal, "Temporal beta diversity <br> (total macrofauna)")),
   tar_target(modrdftot, lm(RichDif ~ poly(PC1_score, 2) * PC2_score, bdtot)),
-  tar_target(rdtotpc1, ggplot(data = bdtot, aes(x = PC1_score,
-                                                y = RichDif,
-                                                colour = Site))+
-               scale_color_manual(values = alpha(pal, .4)) +
-               geom_point(alpha = .6, 
-                          size = 2.5)+
-               geom_smooth(colour = "gray45", 
-                           method = "lm", 
-                           formula = y ~ poly(x,2)
-               )+
-               ylab("Richness Difference")+
-               xlab("Rhodolith Complexity (PC1)")+
-               theme(legend.title = element_text(face = "bold",
-                                                 size = 22),
-                     legend.text = element_text(size = 20),
-                     legend.background = element_blank(),
-                     legend.box.background = element_blank(),
-                     legend.key = element_blank(),
-                     axis.text = element_text(size = 20),
-                     axis.title = element_text(size =22,
-                                               face = "bold")) +
-               guides(fill = guide_legend(title.position = "top"))),
-  tar_target(rdtotpc2, ggplot(data = bdtot, aes(x = PC2_score,
-                                                y = RichDif,
-                                                colour = Site))+
-               scale_color_manual(values = alpha(pal, .4)) +
-               geom_point(alpha = .6, 
-                          size = 2.5)+
-               geom_smooth(colour = "gray45", 
-                           method = "lm"
-               )+
-               ylab("Richness Difference")+
-               xlab("Bed Complexity (PC2)")+
-               theme(legend.title = element_text(face = "bold",
-                                                 size = 22),
-                     legend.text = element_text(size = 20),
-                     legend.background = element_blank(),
-                     legend.box.background = element_blank(),
-                     legend.key = element_blank(),
-                     axis.text = element_text(size = 20),
-                     axis.title = element_text(size =22,
-                                               face = "bold")) +
-               guides(fill = guide_legend(title.position = "top"))),
+  tar_target(surfrdf, bd_surfplot(modrdftot, pal, "Richness difference <br> (total macrofauna)")),
   tar_target(modrptot, lm(Repl ~ poly(PC1_score, 2) * PC2_score, bdtot)),
-  tar_target(rptotpc1, ggplot(data = bdtot, aes(x = PC1_score,
-                                                y = Repl,
-                                                colour = Site))+
-               scale_color_manual(values = alpha(pal, .4)) +
-               geom_point(alpha = .6, 
-                          size = 2.5)+
-               geom_smooth(colour = "gray45", 
-                           method = "lm", 
-                           formula = y ~ poly(x,2)
-               )+
-               ylab("Replacement")+
-               xlab("Rhodolith Complexity (PC1)")+
-               theme(legend.title = element_text(face = "bold",
-                                                 size = 22),
-                     legend.text = element_text(size = 20),
-                     legend.background = element_blank(),
-                     legend.box.background = element_blank(),
-                     legend.key = element_blank(),
-                     axis.text = element_text(size = 20),
-                     axis.title = element_text(size =22,
-                                               face = "bold")) +
-               guides(fill = guide_legend(title.position = "top"))),
-  tar_target(rptotpc2, ggplot(data = bdtot, aes(x = PC2_score,
-                                                y = Repl,
-                                                colour = Site))+
-               scale_color_manual(values = alpha(pal, .4)) +
-               geom_point(alpha = .6, 
-                          size = 2.5)+
-               geom_smooth(colour = "gray45", 
-                           method = lm
-               )+
-               ylab("Replacement")+
-               xlab("Bed Complexity (PC2)")+
-               theme(legend.title = element_text(face = "bold",
-                                                 size = 22),
-                     legend.text = element_text(size = 20),
-                     legend.background = element_blank(),
-                     legend.box.background = element_blank(),
-                     legend.key = element_blank(),
-                     axis.text = element_text(size = 20),
-                     axis.title = element_text(size =22,
-                                               face = "bold")) +
-               guides(fill = guide_legend(title.position = "top"))),
+  tar_target(surfrp, bd_surfplot(modrptot, pal, "Replacement <br> (total macrofauna)")),
       #--- Epifauna ----
   tar_target(modbdepi, lm(BDtotal ~ poly(PC1_score, 2) * PC2_score, bdepi)),
-  tar_target(bdepipc1, ggplot(data = bdepi, aes(x = PC1_score,
-                                                y = BDtotal,
-                                                colour = Site))+
-               scale_color_manual(values = alpha(pal, .4)) +
-               geom_point(alpha = .6, 
-                          size = 2.5)+
-               geom_smooth(colour = "gray45", 
-                           method = "lm", 
-                           formula = y ~ poly(x,2)
-               )+
-               ylab("Epifauna - BDtotal")+
-               xlab("Rhodolith Complexity (PC1)")+
-               theme(legend.title = element_text(face = "bold",
-                                                 size = 22),
-                     legend.text = element_text(size = 20),
-                     legend.background = element_blank(),
-                     legend.box.background = element_blank(),
-                     legend.key = element_blank(),
-                     axis.text = element_text(size = 20),
-                     axis.title = element_text(size =22,
-                                               face = "bold")) +
-               guides(fill = guide_legend(title.position = "top"))),
-  tar_target(bdepipc2, ggplot(data = bdepi, aes(x = PC2_score,
-                                                y = BDtotal,
-                                                colour = Site))+
-               scale_color_manual(values = alpha(pal, .4)) +
-               geom_point(alpha = .6, 
-                          size = 2.5)+
-               geom_smooth(colour = "gray45", 
-                           method = lm
-               )+
-               ylab("Epifauna - BDtotal")+
-               xlab("Bed Complexity (PC2)")+
-               theme(legend.title = element_text(face = "bold",
-                                                 size = 22),
-                     legend.text = element_text(size = 20),
-                     legend.background = element_blank(),
-                     legend.box.background = element_blank(),
-                     legend.key = element_blank(),
-                     axis.text = element_text(size = 20),
-                     axis.title = element_text(size =22,
-                                               face = "bold")) +
-               guides(fill = guide_legend(title.position = "top"))),
+  tar_target(surfbdepi, bd_surfplot(modbdepi, pal, "Temporal beta diversity <br> (Epifauna)")),
   tar_target(modrdfepi, lm(RichDif ~ poly(PC1_score, 2) * PC2_score, bdepi)),
-  tar_target(rdepipc1, ggplot(data = bdepi, aes(x = PC1_score,
-                                                y = RichDif,
-                                                colour = Site))+
-               scale_color_manual(values = alpha(pal, .4)) +
-               geom_point(alpha = .6, 
-                          size = 2.5)+
-               geom_smooth(colour = "gray45", 
-                           method = "lm"
-               )+
-               ylab("Epifauna - Richness Difference")+
-               xlab("Rhodolith Complexity (PC1)")+
-               theme(legend.title = element_text(face = "bold",
-                                                 size = 22),
-                     legend.text = element_text(size = 20),
-                     legend.background = element_blank(),
-                     legend.box.background = element_blank(),
-                     legend.key = element_blank(),
-                     axis.text = element_text(size = 20),
-                     axis.title = element_text(size =22,
-                                               face = "bold")) +
-               guides(fill = guide_legend(title.position = "top"))),
-  tar_target(rdepipc2, ggplot(data = bdepi, aes(x = PC2_score,
-                                                y = RichDif,
-                                                colour = Site))+
-               scale_color_manual(values = alpha(pal, .4)) +
-               geom_point(alpha = .6, 
-                          size = 2.5)+
-               geom_smooth(colour = "gray45", 
-                           method = "lm"
-               )+
-               ylab("Epifauna - Richness Difference")+
-               xlab("Bed Complexity (PC2)")+
-               theme(legend.title = element_text(face = "bold",
-                                                 size = 22),
-                     legend.text = element_text(size = 20),
-                     legend.background = element_blank(),
-                     legend.box.background = element_blank(),
-                     legend.key = element_blank(),
-                     axis.text = element_text(size = 20),
-                     axis.title = element_text(size =22,
-                                               face = "bold")) +
-               guides(fill = guide_legend(title.position = "top"))),
+  tar_target(surfrdfepi, bd_surfplot(modrdfepi, pal, "Richness difference <br> (Epifauna)")),
   tar_target(modrpepi, lm(Repl ~ poly(PC1_score, 2) * PC2_score, bdepi)),
-  tar_target(rpepipc1, ggplot(data = bdepi, aes(x = PC1_score,
-                                                y = Repl,
-                                                colour = Site))+
-               scale_color_manual(values = alpha(pal, .4)) +
-               geom_point(alpha = .6, 
-                          size = 2.5)+
-               geom_smooth(colour = "gray45", 
-                           method = "lm", 
-                           formula = y ~ poly(x,2)
-               )+
-               ylab("Epifauna - Replacement")+
-               xlab("Rhodolith Complexity (PC1)")+
-               theme(legend.title = element_text(face = "bold",
-                                                 size = 22),
-                     legend.text = element_text(size = 20),
-                     legend.background = element_blank(),
-                     legend.box.background = element_blank(),
-                     legend.key = element_blank(),
-                     axis.text = element_text(size = 20),
-                     axis.title = element_text(size =22,
-                                               face = "bold")) +
-               guides(fill = guide_legend(title.position = "top"))),
-  tar_target(rpepipc2, ggplot(data = bdepi, aes(x = PC2_score,
-                                                y = Repl,
-                                                colour = Site))+
-               scale_color_manual(values = alpha(pal, .4)) +
-               geom_point(alpha = .6, 
-                          size = 2.5)+
-               geom_smooth(colour = "gray45", 
-                           method = lm
-               )+
-               ylab("Epifauna - Replacement")+
-               xlab("Bed Complexity (PC2)")+
-               theme(legend.title = element_text(face = "bold",
-                                                 size = 22),
-                     legend.text = element_text(size = 20),
-                     legend.background = element_blank(),
-                     legend.box.background = element_blank(),
-                     legend.key = element_blank(),
-                     axis.text = element_text(size = 20),
-                     axis.title = element_text(size =22,
-                                               face = "bold")) +
-               guides(fill = guide_legend(title.position = "top"))),
+  tar_target(surfrpepi, bd_surfplot(modrpepi, pal, "Replacement <br> (Epifauna)")),
       #--- Infauna ----
   tar_target(modbdinf, lm(BDtotal ~ poly(PC1_score, 2) * PC2_score, bdinf)),
-  tar_target(bdinfpc1, ggplot(data = bdinf, aes(x = PC1_score,
-                                                y = BDtotal,
-                                                colour = Site))+
-               scale_color_manual(values = alpha(pal, .4)) +
-               geom_point(alpha = .6, 
-                          size = 2.5)+
-               geom_smooth(colour = "gray45", 
-                           method = "lm", 
-                           formula = y ~ poly(x,2)
-               )+
-               ylab("Infauna - BDtotal")+
-               xlab("Rhodolith Complexity (PC1)")+
-               theme(legend.title = element_text(face = "bold",
-                                                 size = 22),
-                     legend.text = element_text(size = 20),
-                     legend.background = element_blank(),
-                     legend.box.background = element_blank(),
-                     legend.key = element_blank(),
-                     axis.text = element_text(size = 20),
-                     axis.title = element_text(size =22,
-                                               face = "bold")) +
-               guides(fill = guide_legend(title.position = "top"))),
-  tar_target(bdinfpc2, ggplot(data = bdinf, aes(x = PC2_score,
-                                                y = BDtotal,
-                                                colour = Site))+
-               scale_color_manual(values = alpha(pal, .4)) +
-               geom_point(alpha = .6, 
-                          size = 2.5)+
-               geom_smooth(colour = "gray45", 
-                           method = lm
-               )+
-               ylab("Infauna - BDtotal")+
-               xlab("Bed Complexity (PC2)")+
-               theme(legend.title = element_text(face = "bold",
-                                                 size = 22),
-                     legend.text = element_text(size = 20),
-                     legend.background = element_blank(),
-                     legend.box.background = element_blank(),
-                     legend.key = element_blank(),
-                     axis.text = element_text(size = 20),
-                     axis.title = element_text(size =22,
-                                               face = "bold")) +
-               guides(fill = guide_legend(title.position = "top"))),
+  tar_target(surfbdinf, bd_surfplot(modbdinf, pal, "Temporal beta diversity <br> (Infauna)")),
   tar_target(modrdfinf, lm(RichDif ~ poly(PC1_score, 2) * PC2_score, bdinf)),
-  tar_target(rdinfpc1, ggplot(data = bdinf, aes(x = PC1_score,
-                                                y = RichDif,
-                                                colour = Site))+
-               scale_color_manual(values = alpha(pal, .4)) +
-               geom_point(alpha = .6, 
-                          size = 2.5)+
-               geom_smooth(colour = "gray45", 
-                           method = "lm", 
-                           formula = y ~ poly(x,2)
-               )+
-               ylab("Infauna - Richness Difference")+
-               xlab("Rhodolith Complexity (PC1)")+
-               theme(legend.title = element_text(face = "bold",
-                                                 size = 22),
-                     legend.text = element_text(size = 20),
-                     legend.background = element_blank(),
-                     legend.box.background = element_blank(),
-                     legend.key = element_blank(),
-                     axis.text = element_text(size = 20),
-                     axis.title = element_text(size =22,
-                                               face = "bold")) +
-               guides(fill = guide_legend(title.position = "top"))),
-  tar_target(rdinfpc2, ggplot(data = bdinf, aes(x = PC2_score,
-                                                y = RichDif,
-                                                colour = Site))+
-               scale_color_manual(values = alpha(pal, .4)) +
-               geom_point(alpha = .6, 
-                          size = 2.5)+
-               geom_smooth(colour = "gray45", 
-                           method = "lm"
-               )+
-               ylab("Infauna - Richness Difference")+
-               xlab("Bed Complexity (PC2)")+
-               theme(legend.title = element_text(face = "bold",
-                                                 size = 22),
-                     legend.text = element_text(size = 20),
-                     legend.background = element_blank(),
-                     legend.box.background = element_blank(),
-                     legend.key = element_blank(),
-                     axis.text = element_text(size = 20),
-                     axis.title = element_text(size =22,
-                                               face = "bold")) +
-               guides(fill = guide_legend(title.position = "top"))),
+  tar_target(surfrdfinf, bd_surfplot(modrdfinf, pal, "Richness difference <br> (Infauna)")),
   tar_target(modrpinf, lm(Repl ~ poly(PC1_score, 2) * PC2_score, bdinf)),
-  tar_target(rpinfpc1, ggplot(data = bdinf, aes(x = PC1_score,
-                                                y = Repl,
-                                                colour = Site))+
-               scale_color_manual(values = alpha(pal, .4)) +
-               geom_point(alpha = .6, 
-                          size = 2.5)+
-               geom_smooth(colour = "gray45", 
-                           method = "lm", 
-                           formula = y ~ poly(x,2)
-               )+
-               ylab("Infauna - Replacement")+
-               xlab("Rhodolith Complexity (PC1)")+
-               theme(legend.title = element_text(face = "bold",
-                                                 size = 22),
-                     legend.text = element_text(size = 20),
-                     legend.background = element_blank(),
-                     legend.box.background = element_blank(),
-                     legend.key = element_blank(),
-                     axis.text = element_text(size = 20),
-                     axis.title = element_text(size =22,
-                                               face = "bold")) +
-               guides(fill = guide_legend(title.position = "top"))),
-  tar_target(rpinfpc2, ggplot(data = bdinf, aes(x = PC2_score,
-                                                y = Repl,
-                                                colour = Site))+
-               scale_color_manual(values = alpha(pal, .4)) +
-               geom_point(alpha = .6, 
-                          size = 2.5)+
-               geom_smooth(colour = "gray45", 
-                           method = lm
-               )+
-               ylab("Infauna - Replacement")+
-               xlab("Bed Complexity (PC2)")+
-               theme(legend.title = element_text(face = "bold",
-                                                 size = 22),
-                     legend.text = element_text(size = 20),
-                     legend.background = element_blank(),
-                     legend.box.background = element_blank(),
-                     legend.key = element_blank(),
-                     axis.text = element_text(size = 20),
-                     axis.title = element_text(size =22,
-                                               face = "bold")) +
-               guides(fill = guide_legend(title.position = "top"))),
+tar_target(surfrpinf, bd_surfplot(modrpinf, pal, "Replacement <br> (Infauna)")),
       #--- Interstitial Fauna ----
   tar_target(modbdint, lm(BDtotal ~ poly(PC1_score, 2) * PC2_score, bdint)),
-  tar_target(bdintpc1, ggplot(data = bdint, aes(x = PC1_score,
-                                                y = BDtotal,
-                                                colour = Site))+
-               scale_color_manual(values = alpha(pal, .4)) +
-               geom_point(alpha = .6, 
-                          size = 2.5)+
-               geom_smooth(colour = "gray45", 
-                           method = "lm", 
-                           formula = y ~ poly(x,2)
-               )+
-               ylab("Interstice - BDtotal")+
-               xlab("Rhodolith Complexity (PC1)")+
-               theme(legend.title = element_text(face = "bold",
-                                                 size = 22),
-                     legend.text = element_text(size = 20),
-                     legend.background = element_blank(),
-                     legend.box.background = element_blank(),
-                     legend.key = element_blank(),
-                     axis.text = element_text(size = 20),
-                     axis.title = element_text(size =22,
-                                               face = "bold")) +
-               guides(fill = guide_legend(title.position = "top"))),
-  tar_target(bdintpc2, ggplot(data = bdint, aes(x = PC2_score,
-                                                y = BDtotal,
-                                                colour = Site))+
-               scale_color_manual(values = alpha(pal, .4)) +
-               geom_point(alpha = .6, 
-                          size = 2.5)+
-               geom_smooth(colour = "gray45", 
-                           method = lm
-               )+
-               ylab("Interstice - BDtotal")+
-               xlab("Bed Complexity (PC2)")+
-               theme(legend.title = element_text(face = "bold",
-                                                 size = 22),
-                     legend.text = element_text(size = 20),
-                     legend.background = element_blank(),
-                     legend.box.background = element_blank(),
-                     legend.key = element_blank(),
-                     axis.text = element_text(size = 20),
-                     axis.title = element_text(size =22,
-                                               face = "bold")) +
-               guides(fill = guide_legend(title.position = "top"))),
+  tar_target(surfbdint, bd_surfplot(modbdint, pal, "Temporal beta diversity <br> (Interstitial fauna)")),
   tar_target(modrdfint, lm(RichDif ~ poly(PC1_score, 2) * PC2_score, bdint)),
-  tar_target(rdintpc1, ggplot(data = bdint, aes(x = PC1_score,
-                                                y = RichDif,
-                                                colour = Site))+
-               scale_color_manual(values = alpha(pal, .4)) +
-               geom_point(alpha = .6, 
-                          size = 2.5)+
-               geom_smooth(colour = "gray45", 
-                           method = "lm", 
-                           formula = y ~ poly(x,2)
-               )+
-               ylab("Interstice - Richness Difference")+
-               xlab("Rhodolith Complexity (PC1)")+
-               theme(legend.title = element_text(face = "bold",
-                                                 size = 22),
-                     legend.text = element_text(size = 20),
-                     legend.background = element_blank(),
-                     legend.box.background = element_blank(),
-                     legend.key = element_blank(),
-                     axis.text = element_text(size = 20),
-                     axis.title = element_text(size =22,
-                                               face = "bold")) +
-               guides(fill = guide_legend(title.position = "top"))),
-  tar_target(rdintpc2, ggplot(data = bdint, aes(x = PC2_score,
-                                                y = RichDif,
-                                                colour = Site))+
-               scale_color_manual(values = alpha(pal, .4)) +
-               geom_point(alpha = .6, 
-                          size = 2.5)+
-               geom_smooth(colour = "gray45", 
-                           method = "lm"
-               )+
-               ylab("Interstice - Richness Difference")+
-               xlab("Bed Complexity (PC2)")+
-               theme(legend.title = element_text(face = "bold",
-                                                 size = 22),
-                     legend.text = element_text(size = 20),
-                     legend.background = element_blank(),
-                     legend.box.background = element_blank(),
-                     legend.key = element_blank(),
-                     axis.text = element_text(size = 20),
-                     axis.title = element_text(size =22,
-                                               face = "bold")) +
-               guides(fill = guide_legend(title.position = "top"))),
+  tar_target(surfrdfint, bd_surfplot(modrdfint, pal, "Richness difference <br> (Interstitial fauna)")),
   tar_target(modrpint, lm(Repl ~ poly(PC1_score, 2) * PC2_score, bdint)),
-  tar_target(rpintpc1, ggplot(data = bdint, aes(x = PC1_score,
-                                                y = Repl,
-                                                colour = Site))+
-               scale_color_manual(values = alpha(pal, .4)) +
-               geom_point(alpha = .6, 
-                          size = 2.5)+
-               geom_smooth(colour = "gray45", 
-                           method = "lm", 
-                           formula = y ~ poly(x,2)
-               )+
-               ylab("Interstice - Replacement")+
-               xlab("Rhodolith Complexity (PC1)")+
-               theme(legend.title = element_text(face = "bold",
-                                                 size = 22),
-                     legend.text = element_text(size = 20),
-                     legend.background = element_blank(),
-                     legend.box.background = element_blank(),
-                     legend.key = element_blank(),
-                     axis.text = element_text(size = 20),
-                     axis.title = element_text(size =22,
-                                               face = "bold")) +
-               guides(fill = guide_legend(title.position = "top"))),
-  tar_target(rpintpc2, ggplot(data = bdint, aes(x = PC2_score,
-                                                y = Repl,
-                                                colour = Site))+
-               scale_color_manual(values = alpha(pal, .4)) +
-               geom_point(alpha = .6, 
-                          size = 2.5)+
-               geom_smooth(colour = "gray45", 
-                           method = lm
-               )+
-               ylab("Interstice - Replacement")+
-               xlab("Bed Complexity (PC2)")+
-               theme(legend.title = element_text(face = "bold",
-                                                 size = 22),
-                     legend.text = element_text(size = 20),
-                     legend.background = element_blank(),
-                     legend.box.background = element_blank(),
-                     legend.key = element_blank(),
-                     axis.text = element_text(size = 20),
-                     axis.title = element_text(size =22,
-                                               face = "bold")) +
-               guides(fill = guide_legend(title.position = "top"))),
+  tar_target(surfrpint, bd_surfplot(modrpint, pal, "Replacement <br> (Interstitial fauna)")),
   tar_target(
     bdtrait,
     p.summsbd(
@@ -2077,7 +764,7 @@ tar_target(
       modrdfint,
       pal = pal[c(2, 9, 8, 10)],
       coefs = c(
-        "Rhodolith complexity (PC1)" = "`poly(PC1_score, 2)`1",
+        "Nodule complexity (PC1)" = "`poly(PC1_score, 2)`1",
         "PC1^2" = "`poly(PC1_score, 2)`2",
         "Bed complexity (PC2)" = "PC2_score",
         "PC1:PC2" = "`poly(PC1_score, 2)`1:PC2_score",
@@ -2087,403 +774,25 @@ tar_target(
     
       #--- Arthropoda ----
   tar_target(modbdart, lm(BDtotal ~ poly(PC1_score, 2) * PC2_score, bdart)),
-  tar_target(bdartpc1, ggplot(data = bdart, aes(x = PC1_score,
-                                                y = BDtotal,
-                                                colour = Site))+
-               scale_color_manual(values = alpha(pal, .4)) +
-               geom_point(alpha = .6, 
-                          size = 2.5)+
-               geom_smooth(colour = "gray45", 
-                           method = "lm", 
-                           formula = y ~ poly(x,2)
-               )+
-               ylab("Arthropoda - BDtotal")+
-               xlab("Rhodolith Complexity (PC1)")+
-               theme(legend.title = element_text(face = "bold",
-                                                 size = 22),
-                     legend.text = element_text(size = 20),
-                     legend.background = element_blank(),
-                     legend.box.background = element_blank(),
-                     legend.key = element_blank(),
-                     axis.text = element_text(size = 20),
-                     axis.title = element_text(size =22,
-                                               face = "bold")) +
-               guides(fill = guide_legend(title.position = "top"))),
-  tar_target(bdartpc2, ggplot(data = bdart, aes(x = PC2_score,
-                                                y = BDtotal,
-                                                colour = Site))+
-               scale_color_manual(values = alpha(pal, .4)) +
-               geom_point(alpha = .6, 
-                          size = 2.5)+
-               geom_smooth(colour = "gray45", 
-                           method = lm
-               )+
-               ylab("Arthropoda - BDtotal")+
-               xlab("Bed Complexity (PC2)")+
-               theme(legend.title = element_text(face = "bold",
-                                                 size = 22),
-                     legend.text = element_text(size = 20),
-                     legend.background = element_blank(),
-                     legend.box.background = element_blank(),
-                     legend.key = element_blank(),
-                     axis.text = element_text(size = 20),
-                     axis.title = element_text(size =22,
-                                               face = "bold")) +
-               guides(fill = guide_legend(title.position = "top"))),
+  tar_target(surfbdart, bd_surfplot(modbdart, pal, "Temporal beta diversity <br> (Arthropods)")),
   tar_target(modrdfart, lm(RichDif ~ poly(PC1_score, 2) * PC2_score, bdart)),
-  tar_target(rdartpc1, ggplot(data = bdart, aes(x = PC1_score,
-                                                y = RichDif,
-                                                colour = Site))+
-               scale_color_manual(values = alpha(pal, .4)) +
-               geom_point(alpha = .6, 
-                          size = 2.5)+
-               geom_smooth(colour = "gray45", 
-                           method = "lm", 
-                           formula = y ~ poly(x,2)
-               )+
-               ylab("Arthropoda - Richness Difference")+
-               xlab("Rhodolith Complexity (PC1)")+
-               theme(legend.title = element_text(face = "bold",
-                                                 size = 22),
-                     legend.text = element_text(size = 20),
-                     legend.background = element_blank(),
-                     legend.box.background = element_blank(),
-                     legend.key = element_blank(),
-                     axis.text = element_text(size = 20),
-                     axis.title = element_text(size =22,
-                                               face = "bold")) +
-               guides(fill = guide_legend(title.position = "top"))),
-  tar_target(rdartpc2, ggplot(data = bdart, aes(x = PC2_score,
-                                                y = RichDif,
-                                                colour = Site))+
-               scale_color_manual(values = alpha(pal, .4)) +
-               geom_point(alpha = .6, 
-                          size = 2.5)+
-               geom_smooth(colour = "gray45", 
-                           method = "lm"
-               )+
-               ylab("Arthropoda - Richness Difference")+
-               xlab("Bed Complexity (PC2)")+
-               theme(legend.title = element_text(face = "bold",
-                                                 size = 22),
-                     legend.text = element_text(size = 20),
-                     legend.background = element_blank(),
-                     legend.box.background = element_blank(),
-                     legend.key = element_blank(),
-                     axis.text = element_text(size = 20),
-                     axis.title = element_text(size =22,
-                                               face = "bold")) +
-               guides(fill = guide_legend(title.position = "top"))),
+tar_target(surfrdfart, bd_surfplot(modrdfart, pal, "Richness difference <br> (Arthropods)")),
   tar_target(modrpart, lm(Repl ~ poly(PC1_score, 2) * PC2_score, bdart)),
-  tar_target(rpartpc1, ggplot(data = bdart, aes(x = PC1_score,
-                                                y = Repl,
-                                                colour = Site))+
-               scale_color_manual(values = alpha(pal, .4)) +
-               geom_point(alpha = .6, 
-                          size = 2.5)+
-               geom_smooth(colour = "gray45", 
-                           method = "lm", 
-                           formula = y ~ poly(x,2)
-               )+
-               ylab("Arthropoda - Replacement")+
-               xlab("Rhodolith Complexity (PC1)")+
-               theme(legend.title = element_text(face = "bold",
-                                                 size = 22),
-                     legend.text = element_text(size = 20),
-                     legend.background = element_blank(),
-                     legend.box.background = element_blank(),
-                     legend.key = element_blank(),
-                     axis.text = element_text(size = 20),
-                     axis.title = element_text(size =22,
-                                               face = "bold")) +
-               guides(fill = guide_legend(title.position = "top"))),
-  tar_target(rpartpc2, ggplot(data = bdart, aes(x = PC2_score,
-                                                y = Repl,
-                                                colour = Site))+
-               scale_color_manual(values = alpha(pal, .4)) +
-               geom_point(alpha = .6, 
-                          size = 2.5)+
-               geom_smooth(colour = "gray45", 
-                           method = lm
-               )+
-               ylab("Arthropoda - Replacement")+
-               xlab("Bed Complexity (PC2)")+
-               theme(legend.title = element_text(face = "bold",
-                                                 size = 22),
-                     legend.text = element_text(size = 20),
-                     legend.background = element_blank(),
-                     legend.box.background = element_blank(),
-                     legend.key = element_blank(),
-                     axis.text = element_text(size = 20),
-                     axis.title = element_text(size =22,
-                                               face = "bold")) +
-               guides(fill = guide_legend(title.position = "top"))),
+  tar_target(surfrpart, bd_surfplot(modrpart, pal, "Replacement <br> (Arthropods)")),
       #--- Annelida ----
   tar_target(modbdann, lm(BDtotal ~ poly(PC1_score, 2) * PC2_score, bdann)),
-  tar_target(bdannpc1, ggplot(data = bdann, aes(x = PC1_score,
-                                                y = BDtotal,
-                                                colour = Site))+
-               scale_color_manual(values = alpha(pal, .4)) +
-               geom_point(alpha = .6, 
-                          size = 2.5)+
-               geom_smooth(colour = "gray45", 
-                           method = "lm", 
-                           formula = y ~ poly(x,2)
-               )+
-               ylab("Annelida - BDtotal")+
-               xlab("Rhodolith Complexity (PC1)")+
-               theme(legend.title = element_text(face = "bold",
-                                                 size = 22),
-                     legend.text = element_text(size = 20),
-                     legend.background = element_blank(),
-                     legend.box.background = element_blank(),
-                     legend.key = element_blank(),
-                     axis.text = element_text(size = 20),
-                     axis.title = element_text(size =22,
-                                               face = "bold")) +
-               guides(fill = guide_legend(title.position = "top"))),
-  tar_target(bdannpc2, ggplot(data = bdann, aes(x = PC2_score,
-                                                y = BDtotal,
-                                                colour = Site))+
-               scale_color_manual(values = alpha(pal, .4)) +
-               geom_point(alpha = .6, 
-                          size = 2.5)+
-               geom_smooth(colour = "gray45", 
-                           method = lm
-               )+
-               ylab("Annelida - BDtotal")+
-               xlab("Bed Complexity (PC2)")+
-               theme(legend.title = element_text(face = "bold",
-                                                 size = 22),
-                     legend.text = element_text(size = 20),
-                     legend.background = element_blank(),
-                     legend.box.background = element_blank(),
-                     legend.key = element_blank(),
-                     axis.text = element_text(size = 20),
-                     axis.title = element_text(size =22,
-                                               face = "bold")) +
-               guides(fill = guide_legend(title.position = "top"))),
+  tar_target(surfbdann, bd_surfplot(modbdann, pal, "Temporal beta diversity <br> (Annelids)")),
   tar_target(modrdfann, lm(RichDif ~ poly(PC1_score, 2) * PC2_score, bdann)),
-  tar_target(rdannpc1, ggplot(data = bdann, aes(x = PC1_score,
-                                                y = RichDif,
-                                                colour = Site))+
-               scale_color_manual(values = alpha(pal, .4)) +
-               geom_point(alpha = .6, 
-                          size = 2.5)+
-               geom_smooth(colour = "gray45", 
-                           method = "lm", 
-                           formula = y ~ poly(x,2)
-               )+
-               ylab("Annelida - Richness Difference")+
-               xlab("Rhodolith Complexity (PC1)")+
-               theme(legend.title = element_text(face = "bold",
-                                                 size = 22),
-                     legend.text = element_text(size = 20),
-                     legend.background = element_blank(),
-                     legend.box.background = element_blank(),
-                     legend.key = element_blank(),
-                     axis.text = element_text(size = 20),
-                     axis.title = element_text(size =22,
-                                               face = "bold")) +
-               guides(fill = guide_legend(title.position = "top"))),
-  tar_target(rdannpc2, ggplot(data = bdann, aes(x = PC2_score,
-                                                y = RichDif,
-                                                colour = Site))+
-               scale_color_manual(values = alpha(pal, .4)) +
-               geom_point(alpha = .6, 
-                          size = 2.5)+
-               geom_smooth(colour = "gray45", 
-                           method = "lm"
-               )+
-               ylab("Annelida - Richness Difference")+
-               xlab("Bed Complexity (PC2)")+
-               theme(legend.title = element_text(face = "bold",
-                                                 size = 22),
-                     legend.text = element_text(size = 20),
-                     legend.background = element_blank(),
-                     legend.box.background = element_blank(),
-                     legend.key = element_blank(),
-                     axis.text = element_text(size = 20),
-                     axis.title = element_text(size =22,
-                                               face = "bold")) +
-               guides(fill = guide_legend(title.position = "top"))),
+  tar_target(surfrdfann, bd_surfplot(modrdfann, pal, "Richness difference <br> (Annelids)")),
   tar_target(modrpann, lm(Repl ~ poly(PC1_score, 2) * PC2_score, bdann)),
-  tar_target(rpannpc1, ggplot(data = bdann, aes(x = PC1_score,
-                                                y = Repl,
-                                                colour = Site))+
-               scale_color_manual(values = alpha(pal, .4)) +
-               geom_point(alpha = .6, 
-                          size = 2.5)+
-               geom_smooth(colour = "gray45", 
-                           method = "lm", 
-                           formula = y ~ poly(x,2)
-               )+
-               ylab("Annelida - Replacement")+
-               xlab("Rhodolith Complexity (PC1)")+
-               theme(legend.title = element_text(face = "bold",
-                                                 size = 22),
-                     legend.text = element_text(size = 20),
-                     legend.background = element_blank(),
-                     legend.box.background = element_blank(),
-                     legend.key = element_blank(),
-                     axis.text = element_text(size = 20),
-                     axis.title = element_text(size =22,
-                                               face = "bold")) +
-               guides(fill = guide_legend(title.position = "top"))),
-  tar_target(rpannpc2, ggplot(data = bdann, aes(x = PC2_score,
-                                                y = Repl,
-                                                colour = Site))+
-               scale_color_manual(values = alpha(pal, .4)) +
-               geom_point(alpha = .6, 
-                          size = 2.5)+
-               geom_smooth(colour = "gray45", 
-                           method = lm
-               )+
-               ylab("Annelida - Replacement")+
-               xlab("Bed Complexity (PC2)")+
-               theme(legend.title = element_text(face = "bold",
-                                                 size = 22),
-                     legend.text = element_text(size = 20),
-                     legend.background = element_blank(),
-                     legend.box.background = element_blank(),
-                     legend.key = element_blank(),
-                     axis.text = element_text(size = 20),
-                     axis.title = element_text(size =22,
-                                               face = "bold")) +
-               guides(fill = guide_legend(title.position = "top"))),
+  tar_target(surfrpann, bd_surfplot(modrpann, pal, "Replacement <br> (Annelids)")),
       #--- Mollusca ----
   tar_target(modbdmol, lm(BDtotal ~ poly(PC1_score, 2) * PC2_score, bdmol)),
-  tar_target(bdmolpc1, ggplot(data = bdmol, aes(x = PC1_score,
-                                                y = BDtotal,
-                                                colour = Site))+
-               scale_color_manual(values = alpha(pal, .4)) +
-               geom_point(alpha = .6, 
-                          size = 2.5)+
-               geom_smooth(colour = "gray45", 
-                           method = "lm", 
-                           formula = y ~ poly(x,2)
-               )+
-               ylab("Mollusca - BDtotal")+
-               xlab("Rhodolith Complexity (PC1)")+
-               theme(legend.title = element_text(face = "bold",
-                                                 size = 22),
-                     legend.text = element_text(size = 20),
-                     legend.background = element_blank(),
-                     legend.box.background = element_blank(),
-                     legend.key = element_blank(),
-                     axis.text = element_text(size = 20),
-                     axis.title = element_text(size =22,
-                                               face = "bold")) +
-               guides(fill = guide_legend(title.position = "top"))),
-  tar_target(bdmolpc2, ggplot(data = bdmol, aes(x = PC2_score,
-                                                y = BDtotal,
-                                                colour = Site))+
-               scale_color_manual(values = alpha(pal, .4)) +
-               geom_point(alpha = .6, 
-                          size = 2.5)+
-               geom_smooth(colour = "gray45", 
-                           method = lm
-               )+
-               ylab("Mollusca - BDtotal")+
-               xlab("Bed Complexity (PC2)")+
-               theme(legend.title = element_text(face = "bold",
-                                                 size = 22),
-                     legend.text = element_text(size = 20),
-                     legend.background = element_blank(),
-                     legend.box.background = element_blank(),
-                     legend.key = element_blank(),
-                     axis.text = element_text(size = 20),
-                     axis.title = element_text(size =22,
-                                               face = "bold")) +
-               guides(fill = guide_legend(title.position = "top"))),
+  tar_target(surfbdmol, bd_surfplot(modbdmol, pal, "Temporal beta diversity <br> (Molluscs)")),
   tar_target(modrdfmol, lm(RichDif ~ poly(PC1_score, 2) * PC2_score, bdmol)),
-  tar_target(rdmolpc1, ggplot(data = bdmol, aes(x = PC1_score,
-                                                y = RichDif,
-                                                colour = Site))+
-               scale_color_manual(values = alpha(pal, .4)) +
-               geom_point(alpha = .6, 
-                          size = 2.5)+
-               geom_smooth(colour = "gray45", 
-                           method = "lm", 
-                           formula = y ~ poly(x,2)
-               )+
-               ylab("Mollusca - Richness Difference")+
-               xlab("Rhodolith Complexity (PC1)")+
-               theme(legend.title = element_text(face = "bold",
-                                                 size = 22),
-                     legend.text = element_text(size = 20),
-                     legend.background = element_blank(),
-                     legend.box.background = element_blank(),
-                     legend.key = element_blank(),
-                     axis.text = element_text(size = 20),
-                     axis.title = element_text(size =22,
-                                               face = "bold")) +
-               guides(fill = guide_legend(title.position = "top"))),
-  tar_target(rdmolpc2, ggplot(data = bdmol, aes(x = PC2_score,
-                                                y = RichDif,
-                                                colour = Site))+
-               scale_color_manual(values = alpha(pal, .4)) +
-               geom_point(alpha = .6, 
-                          size = 2.5)+
-               geom_smooth(colour = "gray45", 
-                           method = "lm"
-               )+
-               ylab("Mollusca - Richness Difference")+
-               xlab("Bed Complexity (PC2)")+
-               theme(legend.title = element_text(face = "bold",
-                                                 size = 22),
-                     legend.text = element_text(size = 20),
-                     legend.background = element_blank(),
-                     legend.box.background = element_blank(),
-                     legend.key = element_blank(),
-                     axis.text = element_text(size = 20),
-                     axis.title = element_text(size =22,
-                                               face = "bold")) +
-               guides(fill = guide_legend(title.position = "top"))),
+  tar_target(surfrdfmol, bd_surfplot(modrdfmol, pal, "Richness difference <br> (Molluscs)")),
   tar_target(modrpmol, lm(Repl ~ poly(PC1_score, 2) * PC2_score, bdmol)),
-  tar_target(rpmolpc1, ggplot(data = bdmol, aes(x = PC1_score,
-                                                y = Repl,
-                                                colour = Site))+
-               scale_color_manual(values = alpha(pal, .4)) +
-               geom_point(alpha = .6, 
-                          size = 2.5)+
-               geom_smooth(colour = "gray45", 
-                           method = "lm", 
-                           formula = y ~ poly(x,2)
-               )+
-               ylab("Mollusca - Replacement")+
-               xlab("Rhodolith Complexity (PC1)")+
-               theme(legend.title = element_text(face = "bold",
-                                                 size = 22),
-                     legend.text = element_text(size = 20),
-                     legend.background = element_blank(),
-                     legend.box.background = element_blank(),
-                     legend.key = element_blank(),
-                     axis.text = element_text(size = 20),
-                     axis.title = element_text(size =22,
-                                               face = "bold")) +
-               guides(fill = guide_legend(title.position = "top"))),
-  tar_target(rpmolpc2, ggplot(data = bdmol, aes(x = PC2_score,
-                                                y = Repl,
-                                                colour = Site))+
-               scale_color_manual(values = alpha(pal, .4)) +
-               geom_point(alpha = .6, 
-                          size = 2.5)+
-               geom_smooth(colour = "gray45", 
-                           method = lm
-               )+
-               ylab("Mollusca - Replacement")+
-               xlab("Bed Complexity (PC2)")+
-               theme(legend.title = element_text(face = "bold",
-                                                 size = 22),
-                     legend.text = element_text(size = 20),
-                     legend.background = element_blank(),
-                     legend.box.background = element_blank(),
-                     legend.key = element_blank(),
-                     axis.text = element_text(size = 20),
-                     axis.title = element_text(size =22,
-                                               face = "bold")) +
-               guides(fill = guide_legend(title.position = "top"))),
+  tar_target(surfrpmol, bd_surfplot(modrpmol, pal, "Replacement <br> (Molluscs)")),
   tar_target(
     bdphyl,
     p.summsbd(
@@ -2501,7 +810,7 @@ tar_target(
       modrdfmol,
       pal = pal[c(1, 3:5)],
       coefs = c(
-        "Rhodolith complexity (PC1)" = "`poly(PC1_score, 2)`1",
+        "Nodule complexity (PC1)" = "`poly(PC1_score, 2)`1",
         "PC1^2" = "`poly(PC1_score, 2)`2",
         "Bed complexity (PC2)" = "PC2_score",
         "PC1:PC2" = "`poly(PC1_score, 2)`1:PC2_score",

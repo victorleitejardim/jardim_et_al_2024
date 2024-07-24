@@ -6,6 +6,9 @@
 *.Rproj
 .index_cache/
 .index_files/
+.revised_models_cache/
+.revised_models_files/
 .Rplots.pdf
 .Renviron
 .pdf
+

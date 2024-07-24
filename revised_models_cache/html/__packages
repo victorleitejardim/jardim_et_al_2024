@@ -1,0 +1,16 @@
+dplyr
+targets
+ggplot2
+plotly
+permute
+lattice
+vegan
+Matrix
+lme4
+jtools
+sandwich
+fixest
+broom
+zoo
+lmtest
+pbkrtest
