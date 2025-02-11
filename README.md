@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# Jardim et al. (2024): Data and Supplemental Information <img src="man/figures/package-sticker.png" align="right" style="float:right; height:120px;"/>
+# Jardim et al. (2025): Data and Supplemental Information <img src="man/figures/package-sticker.png" align="right" style="float:right; height:120px;"/>
 
 <!-- badges: start -->
 
@@ -11,7 +11,7 @@ v2](https://img.shields.io/badge/License-GPL%20v2-blue.svg)](https://www.gnu.org
 <!-- badges: end -->
 
 This is the research compendium containing all analysis in Jardim et
-al. (2024): **Habitat Complexity Promotes Species Richness and Community
+al. (2025): **Habitat Complexity Promotes Species Richness and Community
 Stability:** *a case study in a biogenic habitat*
 
 ## Running the code
