@@ -67,8 +67,8 @@
     colnames(sp_fit) <- c("RDA1.fit", "RDA2.fit")
     
     sp_fit <- as.data.frame(sp_fit) %>% 
-        mutate(Label = rownames(.)) %>% 
-        select(Label, everything())
+        mutate(label = rownames(.)) %>% 
+        select(label, everything())
 
     ## fix-up axes needed to plot
     laxes <- length(axes)
@@ -82,7 +82,7 @@
     }
 
     obj <- fortify(object, axes = axes, const = const, ...) # grab some scores
-    available <- levels(obj[["Score"]])
+    available <- levels(obj[["score"]])
     draw_list <- layer_draw_list(valid, layers, available) # what are we drawing
     layer_names <- names(draw_list)[draw_list]
     
@@ -95,7 +95,7 @@
     geom <- unique(geom)    # simplify geom if elements are the same
 
     ## subset out the layers wanted
-    obj <- obj[obj[["Score"]] %in% layer_names, , drop = FALSE]
+    obj <- obj[obj[["score"]] %in% layer_names, , drop = FALSE]
 
     ## skeleton layer
     plt <- ggplot()
@@ -107,16 +107,16 @@
 
     ## remove biplot arrows for centroids if present
     if(all(draw_list[c("biplot","centroids")])) {
-        want <- obj[["Score"]] == "biplot"
+        want <- obj[["score"]] == "biplot"
         tmp <- obj[want, ]
         obj <- obj[!want, ]
-        bnam <- tmp[, "Label"]
-        cnam <- obj[obj[["Score"]] == "centroids", "Label"]
+        bnam <- tmp[, "label"]
+        cnam <- obj[obj[["score"]] == "centroids", "label"]
         obj <- rbind(obj, tmp[!bnam %in% cnam, , drop = FALSE])
     }
 
     if(isTRUE(draw_list["biplot"])) {
-        want <- obj[["Score"]] == "biplot"
+        want <- obj[["score"]] == "biplot"
         if (length(layer_names) > 1) {
             mul <- arrowMul(obj[want, vars, drop = FALSE],
                             obj[!want, vars, drop = FALSE])
@@ -132,14 +132,14 @@
         obj[want, vars] <- 1.1 * obj[want, vars]
         plt <- plt + geom_text_repel(data = obj[want, , drop = FALSE ],
                                aes_string(x = vars[1], y = vars[2],
-                                          label = 'Label'), size = font.size, colour = col, point.size = 3, max.overlaps = Inf)
+                                          label = 'label'), size = font.size, colour = col, point.size = 3, max.overlaps = Inf)
     }
 
     if(isTRUE(draw_list["centroids"])) {
-        want <- obj[["Score"]] == "centroids"
+        want <- obj[["score"]] == "centroids"
         plt <- plt +
             geom_point(data = obj[want, , drop = FALSE],
-                      aes_string(x = vars[1], y = vars[2], label = 'Label'), shape = 24, fill = scale.fill, size = 5)
+                      aes_string(x = vars[1], y = vars[2], label = 'label'), shape = 24, fill = scale.fill, size = 5)
     }
     var_axes <- as.numeric(round(object$CCA$eig/object$tot.chi*100,2))
     if(missing(xlab)) {

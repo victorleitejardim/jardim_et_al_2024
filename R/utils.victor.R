@@ -180,11 +180,11 @@
         scale.colour <- scale.colour
         ## case of a single geom
         if (length(geom) == 1L) {
-            take <- object[["Score"]] %in% wanted
+            take <- object[["score"]] %in% wanted
             if (geom == "point") {
                 plt <- plt +
                     geom_point(data = object[take, , drop = FALSE],
-                               aes_string(x = vars[1], y = vars[2],shape = 'Score', colour = group), size = 2.5)+
+                               aes_string(x = vars[1], y = vars[2],shape = 'score', colour = group), size = 2.5)+
                     scale_fill_manual(values = scale.fill, name = "Sites")+
                     scale_colour_manual(values = scale.colour, name = "Sites")
                     
@@ -199,12 +199,12 @@
         } else {
             ## we have to plot species and sites/constraints separately
                         if (any(c("sites","constraints") %in% wanted)) {
-                take <- object[["Score"]] %in% c("sites","constraints")
+                take <- object[["score"]] %in% c("sites","constraints")
                 if (geom[1L] == "point") {
                     plt <- plt +
                         geom_point(data = object[take, , drop = FALSE],
                                    aes_string(x = vars[1], y = vars[2],
-                                              shape = 'Score',
+                                              shape = 'score',
                                               colour = group), size = 2.5)+
                         scale_fill_manual(values = alpha(scale.fill, .3), name = "Sites")+
                         scale_colour_manual(values = alpha(scale.colour), name = "Sites")
@@ -229,7 +229,7 @@
         }
         
         if ("species" %in% wanted) {
-            take <- object[["Score"]] == "species"
+            take <- object[["score"]] == "species"
             
             pdat <- object[take, , drop = FALSE]
             
@@ -266,7 +266,7 @@
                                     aes_string(x = vars[1],
                                                y = vars[2],
                                                label = 'Label',
-                                               colour = 'Score'),
+                                               colour = 'score'),
                                     size = font.size, segment.colour = "gray80", max.overlaps = Inf )
                 
             }
@@ -276,7 +276,7 @@
 
     ## now check if species should be added as arrows
     if (isTRUE(arrows) && draw_list["species"]) {
-        take <- object[["Score"]] == "species"
+        take <- object[["score"]] == "species"
         
         pdat <- object[take, , drop = FALSE]
         

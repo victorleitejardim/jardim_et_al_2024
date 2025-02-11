@@ -1,5 +1,5 @@
 ---
-title: "Jardim et al. (2024): Supporting Information"
+title: "Jardim et al. (2025): Supporting Information (DOI: 10.1111/oik.10675)"
 subtitle: "Appendix S1"
 author: 
   - Victor L. Jardim
